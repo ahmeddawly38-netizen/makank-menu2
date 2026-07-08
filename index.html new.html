@@ -10,8 +10,8 @@
 </head>
 <body class="pb-32">
 
-    <header class="bg-black text-white p-4 text-center shadow-lg border-b-4 border-orange-500">
-        <img src="https://ibb.co/t1zbPPy" alt="لوجو مطعم مكانك" class="w-24 h-24 mx-auto mb-2 rounded-full border-2 border-orange-500 bg-white">
+    <header class="bg-black text-white p-6 text-center shadow-lg border-b-4 border-orange-500">
+        <img src="https://via.placeholder.com/100" alt="لوجو مطعم مكانك" class="w-24 h-24 mx-auto mb-2 rounded-full border-2 border-orange-500 bg-white">
         <h1 class="text-2xl font-bold text-orange-500">مطعم مكانك</h1>
         <p class="text-gray-400 text-sm">أبو صقل، شارع المثلث</p>
     </header>
@@ -53,7 +53,7 @@
                         <div class="flex-grow">
                             <h3 class="font-bold text-sm">${item.n}</h3>
                             <p class="text-orange-600 font-bold text-sm">${item.p} ج.م</p>
-                            <input type="text" id="note-${item.n}" placeholder="ملاحظات.." class="text-[10px] border rounded w-full mt-1 p-1">
+                            <input type="text" id="note-${item.n.replace(/\s+/g, '-')}" placeholder="ملاحظات.." class="text-[10px] border rounded w-full mt-1 p-1">
                         </div>
                         <button onclick="addToCart('${item.n}', ${item.p})" class="bg-black text-white px-4 py-2 rounded-lg font-bold">+</button>
                     </div>
@@ -62,8 +62,10 @@
         }
 
         function addToCart(n, p) {
-            if (!cart[n]) cart[n] = { p, q: 0, note: document.getElementById('note-'+n).value };
+            const noteInput = document.getElementById('note-'+n.replace(/\s+/g, '-'));
+            if (!cart[n]) cart[n] = { p, q: 0, note: noteInput.value };
             cart[n].q++;
+            cart[n].note = noteInput.value;
             document.getElementById('cart-section').classList.remove('hidden');
             updateUI();
         }
@@ -77,25 +79,5 @@
             });
 
             const delivery = document.getElementById('delivery-type').value === 'delivery' ? 10 : 0;
-            document.getElementById('cart-items').innerHTML = cartHtml;
             document.getElementById('total-price').innerText = "الإجمالي: " + (total + delivery) + " ج.م";
-        }
-
-        function sendToWhatsApp() {
-            let msg = "*طلب جديد من مطعم مكانك*%0A---------------------------%0A";
-            Object.keys(cart).forEach((n, i) => {
-                msg += `${i+1}- *${n}* (x${cart[n].q})%0A`;
-                if(cart[n].note) msg += `   📝 ملاحظة: ${cart[n].note}%0A`;
-            });
-            const delivery = document.getElementById('delivery-type').value === 'delivery' ? 10 : 0;
-            msg += `---------------------------%0A`;
-            msg += `🛵 نوع الطلب: ${document.getElementById('delivery-type').options[document.getElementById('delivery-type').selectedIndex].text}%0A`;
-            msg += `*💰 الإجمالي النهائي: ${parseInt(document.getElementById('total-price').innerText.replace(/\D/g,''))} ج.م*%0A%0A🏠 الاسم والعنوان:`;
-            
-            window.open(`https://wa.me/201021477251?text=${msg}`, '_blank');
-        }
-
-        renderMenu();
-    </script>
-</body>
-</html>
+            document.getElementById('cart-
