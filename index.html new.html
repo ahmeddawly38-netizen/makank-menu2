@@ -2,107 +2,49 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مطعم مكانك - المنيو</title>
+    <title>مطعم مكانك</title>
     <style>
-        body { font-family: sans-serif; background: #f4f4f4; margin: 0; padding-bottom: 120px; }
-        header { background: #000; color: #ff9900; text-align: center; padding: 20px; }
-        .cat-title { background: #ff9900; color: #000; padding: 10px; margin: 15px 10px 5px; border-radius: 8px; font-weight: bold; }
-        .item-card { background: #fff; padding: 12px; margin: 5px 10px; border-radius: 8px; display: flex; flex-direction: column; }
-        input { width: 95%; padding: 8px; margin: 5px 0; border: 1px solid #ccc; border-radius: 5px; font-size: 12px; }
-        .add-btn { background: #000; color: #ff9900; border: none; padding: 10px; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 5px; }
-        #floating-cart { position: fixed; bottom: 20px; right: 20px; left: 20px; background: #000; color: #fff; padding: 15px; border-radius: 50px; text-align: center; font-weight: bold; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 1000; }
-        #cart-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; overflow-y: auto; }
-        .modal-content { background: white; margin: 5% auto; padding: 20px; width: 85%; border-radius: 15px; }
+        body { font-family: sans-serif; background: #f4f4f4; padding-bottom: 100px; }
+        .item-card { background: #fff; padding: 15px; margin: 10px; border-radius: 10px; border: 1px solid #ddd; }
+        .price-btn { background: #ff9900; color: #000; padding: 8px 15px; border-radius: 5px; margin: 5px; border: none; cursor: pointer; font-weight:bold; }
+        header { background: #000; color: #ff9900; text-align: center; padding: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
-
-    <header><h1>مطعم مكانك</h1></header>
-
-    <div id="menu-container"></div>
-
-    <div id="floating-cart" onclick="showModal()">🛒 عرض الطلبات (0)</div>
-
-    <div id="cart-modal">
-        <div class="modal-content">
-            <h2 style="text-align:center">سلة الطلبات</h2>
-            <div id="cart-details"></div>
-            <button onclick="sendToWhatsApp()" style="width:100%; background:green; color:white; padding:12px; border:none; border-radius:8px; margin-top:10px;">إرسال الأوردر واتساب 🚚</button>
-            <button onclick="hideModal()" style="width:100%; background:#ccc; margin-top:10px; border:none; padding:10px; border-radius:8px;">إغلاق</button>
-        </div>
-    </div>
+    <header>مطعم مكانك</header>
+    <div id="menu">جاري تحميل المنيو...</div>
 
     <script>
-        const menuData = [
-            { cat: "كريب فراخ", items: [{n:"بانيه", p:65}, {n:"استربس", p:80}, {n:"مشكل فراخ", p:100}] },
-            { cat: "كريب لحوم", items: [{n:"برجر", p:80}, {n:"هوت دوج", p:80}, {n:"مشكل لحوم", p:100}] },
-            { cat: "فطيرة لحوم", items: [{n:"برجر", p:50}, {n:"مشكل لحوم", p:80}] }
-        ];
+        // الرابط المباشر لجدولك
+        const SHEET_URL = "https://docs.google.com/spreadsheets/d/1Ma5vOPN4iU321SfRkkg1KF3vumXnCpdLExw9e_zw764/export?format=csv";
 
-        let cart = [];
-        let orderCounter = 1;
-
-        function initMenu() {
-            let container = document.getElementById('menu-container');
-            menuData.forEach((cat, cIdx) => {
-                container.innerHTML += `<div class="cat-title">${cat.cat}</div>`;
-                cat.items.forEach((item, iIdx) => {
-                    let id = `n_${cIdx}_${iIdx}`;
-                    container.innerHTML += `
+        async function loadMenu() {
+            try {
+                const response = await fetch(SHEET_URL);
+                const data = await response.text();
+                const rows = data.split('\n').slice(1);
+                
+                let html = "";
+                rows.forEach(row => {
+                    const [cat, name, priceMid, priceBig] = row.split(',');
+                    if(!name) return;
+                    
+                    html += `
                         <div class="item-card">
-                            <div style="display:flex; justify-content:space-between;"><b>${item.n}</b> <b>${item.p} ج.م</b></div>
-                            <input type="text" id="${id}" placeholder="ملاحظات..">
-                            <button class="add-btn" onclick="addToCart('${item.n}', ${item.p}, '${id}')">إضافة +</button>
-                        </div>`;
+                            <h3>${name}</h3>
+                            <input type="text" id="note-${name}" placeholder="ملاحظات..">
+                            <br>
+                            <button class="price-btn" onclick="alert('تمت إضافة ${name} وسط')">وسط (${priceMid} ج.م)</button>
+                            <button class="price-btn" onclick="alert('تمت إضافة ${name} كبير')">كبير (${priceBig} ج.م)</button>
+                        </div>
+                    `;
                 });
-            });
+                document.getElementById('menu').innerHTML = html;
+            } catch (err) {
+                document.getElementById('menu').innerHTML = "حدث خطأ في تحميل المنيو. تأكد أن الملف مشارك للجميع.";
+            }
         }
-
-        function addToCart(name, price, noteId) {
-            let note = document.getElementById(noteId).value;
-            cart.push({ name, price, note });
-            updateCart();
-        }
-
-        function updateCart() {
-            let total = cart.reduce((sum, item) => sum + item.price, 0);
-            document.getElementById('floating-cart').innerText = `🛒 عرض الطلبات (${cart.length}) - ${total} ج.م`;
-        }
-
-        function showModal() {
-            let html = cart.map((i, idx) => `<p style="border-bottom:1px solid #eee; padding:5px;">${idx+1}. ${i.name} ${i.note ? '('+i.note+')' : ''} - ${i.price} ج.م</p>`).join('');
-            document.getElementById('cart-details').innerHTML = html || "السلة فارغة";
-            document.getElementById('cart-modal').style.display = 'block';
-        }
-
-        function hideModal() { document.getElementById('cart-modal').style.display = 'none'; }
-
-        function sendToWhatsApp() {
-            let grouped = {};
-            cart.forEach(item => {
-                if (!grouped[item.name]) grouped[item.name] = { price: item.price, count: 0, notes: [] };
-                grouped[item.name].count++;
-                if (item.note) grouped[item.name].notes.push(item.note);
-            });
-
-            let msg = `🧾 [ بون أوردر جديد ]%0A🏷️ فاتورة: MK${String(orderCounter).padStart(3, '0')}%0A%0A`;
-            let total = 0;
-            Object.keys(grouped).forEach(name => {
-                let item = grouped[name];
-                let itemTotal = item.price * item.count;
-                total += itemTotal;
-                msg += `▪️ *${name}* (العدد: ${item.count})%0A`;
-                item.notes.forEach((n, i) => { msg += `📝 ملاحظة ${i+1}: ${n}%0A`; });
-                msg += `السعر: ${item.price} × ${item.count} = ${itemTotal} ج.م%0A%0A`;
-            });
-            msg += `💰 الإجمالي النهائي: ${total} ج.م`;
-
-            orderCounter++;
-            window.open('https://wa.me/201021477251?text=' + msg, '_blank');
-        }
-
-        initMenu();
+        loadMenu();
     </script>
 </body>
 </html>
