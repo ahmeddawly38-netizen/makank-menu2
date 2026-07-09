@@ -2,19 +2,21 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مطعم مكانك</title>
     <style>
-        body { font-family: sans-serif; background: #f4f4f4; padding-bottom: 120px; }
+        body { font-family: sans-serif; background: #f4f4f4; margin: 0; padding-bottom: 120px; }
+        header { background: #000; color: #ff9900; text-align: center; padding: 20px; font-weight: bold; font-size: 20px; }
         .item-card { background: #fff; padding: 15px; margin: 10px; border-radius: 10px; border: 1px solid #ddd; }
         .price-btn { background: #ff9900; color: #000; padding: 8px 15px; border-radius: 5px; margin: 5px; border: none; cursor: pointer; font-weight:bold; }
         #floating-cart { position: fixed; bottom: 20px; right: 20px; left: 20px; background: #000; color: #fff; padding: 15px; border-radius: 50px; text-align: center; font-weight: bold; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 1000; }
         #cart-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; overflow-y: auto; }
-        .modal-content { background: white; margin: 10% auto; padding: 20px; width: 85%; border-radius: 15px; }
+        .modal-content { background: white; margin: 5% auto; padding: 20px; width: 85%; border-radius: 15px; }
     </style>
 </head>
 <body>
 
-    <header style="background: #000; color: #ff9900; text-align: center; padding: 20px; font-weight: bold;">مطعم مكانك</header>
+    <header>مطعم مكانك</header>
     <div id="menu">جاري تحميل المنيو...</div>
     
     <div id="floating-cart" onclick="showModal()">🛒 عرض الطلبات (0)</div>
@@ -33,24 +35,28 @@
         let cart = [];
 
         async function loadMenu() {
-            const response = await fetch(SHEET_URL);
-            const data = await response.text();
-            const rows = data.split('\n').slice(1);
-            let html = "";
-            rows.forEach((row, idx) => {
-                const [cat, name, priceMid, priceBig] = row.split(',');
-                if(!name) return;
-                html += `
-                    <div class="item-card">
-                        <h3>${name}</h3>
-                        <input type="text" id="note-${idx}" placeholder="ملاحظات..">
-                        <br>
-                        <button class="price-btn" onclick="addToCart('${name}', ${priceMid}, 'وسط', 'note-${idx}')">وسط (${priceMid} ج.م)</button>
-                        <button class="price-btn" onclick="addToCart('${name}', ${priceBig}, 'كبير', 'note-${idx}')">كبير (${priceBig} ج.م)</button>
-                    </div>
-                `;
-            });
-            document.getElementById('menu').innerHTML = html;
+            try {
+                const response = await fetch(SHEET_URL);
+                const data = await response.text();
+                const rows = data.split('\n').slice(1);
+                let html = "";
+                rows.forEach((row, idx) => {
+                    const [cat, name, priceMid, priceBig] = row.split(',');
+                    if(!name) return;
+                    html += `
+                        <div class="item-card">
+                            <h3>${name}</h3>
+                            <input type="text" id="note-${idx}" placeholder="ملاحظات..">
+                            <br>
+                            <button class="price-btn" onclick="addToCart('${name}', ${priceMid}, 'وسط', 'note-${idx}')">وسط (${priceMid} ج.م)</button>
+                            <button class="price-btn" onclick="addToCart('${name}', ${priceBig}, 'كبير', 'note-${idx}')">كبير (${priceBig} ج.م)</button>
+                        </div>
+                    `;
+                });
+                document.getElementById('menu').innerHTML = html;
+            } catch (err) {
+                document.getElementById('menu').innerHTML = "تعذر تحميل المنيو، تأكد من اتصال الإنترنت.";
+            }
         }
 
         function addToCart(name, price, size, noteId) {
