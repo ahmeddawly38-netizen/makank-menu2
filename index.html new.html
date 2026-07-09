@@ -46,7 +46,6 @@
             try {
                 const response = await fetch(SHEET_URL);
                 const data = await response.text();
-                // تنظيف البيانات من السطور الفارغة تماماً
                 const rows = data.split('\n').filter(row => row.trim() !== "").slice(1);
                 let html = "";
                 
@@ -75,7 +74,7 @@
                 });
                 document.getElementById('menu').innerHTML = html;
             } catch (err) {
-                document.getElementById('menu').innerHTML = "خطأ في التحميل. تأكد من اتصال الإنترنت أو مشاركة الجدول.";
+                document.getElementById('menu').innerHTML = "خطأ في التحميل.";
             }
         }
 
@@ -94,11 +93,13 @@
         }
 
         function clearCart() { cart = []; localStorage.setItem('myCart', JSON.stringify(cart)); updateFloatingBtn(); showModal(); }
+        
         function updateFloatingBtn() {
             let total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
             let count = cart.reduce((sum, item) => sum + item.qty, 0);
             document.getElementById('floating-cart').innerText = `🛒 عرض الطلبات (${count}) - ${total} ج.م`;
         }
+
         function showModal() {
             let total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
             document.getElementById('cart-details').innerHTML = cart.map((i, idx) => 
@@ -107,10 +108,27 @@
             document.getElementById('total-price').innerText = cart.length > 0 ? "الإجمالي: " + total + " ج.م" : "";
             document.getElementById('cart-modal').style.display = 'block';
         }
+
         function hideModal() { document.getElementById('cart-modal').style.display = 'none'; }
+
         function sendToWhatsApp() {
             let total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-            let msg = "طلب جديد من مطعم مكانك:%0A" + cart.map(i => `▪️ ${i.name} (x${i.qty}) ${i.note ? '['+i.note+']' : ''} - ${i.price * i.qty} ج.م`).join('%0A') + "%0A%0A*إجمالي الحساب: " + total + " ج.م*";
+            let now = new Date();
+            let dateStr = now.toLocaleDateString('ar-EG');
+            let timeStr = now.toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'});
+
+            let msg = `*طلب جديد من مطعم مكانك* 🍔%0A`;
+            msg += `--------------------------%0A`;
+            msg += `📅 التاريخ: ${dateStr}%0A`;
+            msg += `⏰ الوقت: ${timeStr}%0A`;
+            msg += `--------------------------%0A%0A`;
+            
+            msg += cart.map(i => `✅ *${i.name}* %0A   الكمية: ${i.qty} | السعر: ${i.price * i.qty} ج.م ${i.note ? '%0A   📝 ملاحظة: ' + i.note : ''}`).join('%0A%0A');
+            
+            msg += `%0A%0A--------------------------%0A`;
+            msg += `💰 *إجمالي الحساب: ${total} ج.م*`;
+            msg += `%0A--------------------------`;
+
             window.open('https://wa.me/201013740837?text=' + msg, '_blank');
         }
         loadMenu();
