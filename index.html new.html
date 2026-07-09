@@ -28,31 +28,33 @@
         <div class="modal-content">
             <h2 style="text-align:center">سلة الطلبات</h2>
             <div id="cart-details"></div>
+            <p id="total-price" style="font-weight:bold; text-align:center;"></p>
             <button onclick="sendToWhatsApp()" style="width:100%; background:green; color:white; padding:12px; border:none; border-radius:8px;">إرسال الأوردر واتساب 🚚</button>
+            <button onclick="clearCart()" style="width:100%; background:#ff4444; color:white; margin-top:10px; border:none; padding:10px; border-radius:8px;">مسح السلة</button>
             <button onclick="hideModal()" style="width:100%; background:#ccc; margin-top:10px; border:none; padding:10px; border-radius:8px;">إغلاق</button>
         </div>
     </div>
 
     <script>
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/1Ma5vOPN4iU321SfRkkg1KF3vumXnCpdLExw9e_zw764/export?format=csv";
-        let cart = [];
+        let cart = JSON.parse(localStorage.getItem('myCart')) || [];
         let currentCat = "";
+
+        // تحديث الزر عند تحميل الصفحة
+        updateFloatingBtn();
 
         async function loadMenu() {
             const response = await fetch(SHEET_URL);
             const data = await response.text();
             const rows = data.split('\n').slice(1);
             let html = "";
-            
             rows.forEach((row, idx) => {
                 const [cat, name, priceMid, priceBig] = row.split(',');
                 if(!name) return;
-                
                 if (cat !== currentCat) {
                     html += `<div class="cat-title">${cat}</div>`;
                     currentCat = cat;
                 }
-                
                 html += `
                     <div class="item-card">
                         <h3>${name}</h3>
@@ -69,10 +71,21 @@
         function addToCart(name, price, size, noteId) {
             let note = document.getElementById(noteId).value;
             cart.push({ name: `${name} (${size})`, price, note });
-            updateFloatingBtn();
+            saveAndRefresh();
             let toast = document.getElementById('toast');
             toast.style.display = 'block';
             setTimeout(() => { toast.style.display = 'none'; }, 2000);
+        }
+
+        function saveAndRefresh() {
+            localStorage.setItem('myCart', JSON.stringify(cart));
+            updateFloatingBtn();
+        }
+
+        function clearCart() {
+            cart = [];
+            saveAndRefresh();
+            showModal();
         }
 
         function updateFloatingBtn() {
@@ -81,14 +94,17 @@
         }
 
         function showModal() {
+            let total = cart.reduce((sum, item) => sum + item.price, 0);
             document.getElementById('cart-details').innerHTML = cart.map((i, idx) => `<p>${idx+1}. ${i.name} ${i.note ? '('+i.note+')' : ''} - ${i.price} ج.م</p>`).join('') || "السلة فارغة";
+            document.getElementById('total-price').innerText = cart.length > 0 ? "الإجمالي: " + total + " ج.م" : "";
             document.getElementById('cart-modal').style.display = 'block';
         }
 
         function hideModal() { document.getElementById('cart-modal').style.display = 'none'; }
 
         function sendToWhatsApp() {
-            let msg = "طلب جديد:%0A" + cart.map(i => `* ${i.name} - ${i.price} ج.م ${i.note ? '('+i.note+')' : ''}`).join('%0A');
+            let total = cart.reduce((sum, item) => sum + item.price, 0);
+            let msg = "طلب جديد من مطعم مكانك:%0A" + cart.map(i => `* ${i.name} - ${i.price} ج.م ${i.note ? '('+i.note+')' : ''}`).join('%0A') + "%0A%0A*إجمالي الحساب: " + total + " ج.م*";
             window.open('https://wa.me/201013740837?text=' + msg, '_blank');
         }
 
