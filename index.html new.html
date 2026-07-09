@@ -5,89 +5,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مطعم مكانك</title>
     <style>
-        body { font-family: sans-serif; background: #f4f4f4; margin: 0; padding-bottom: 150px; }
-        header { background: #000; color: #ff9900; text-align: center; padding: 20px; font-size: 24px; font-weight: bold; }
-        .card { background: white; padding: 15px; margin: 10px; border-radius: 10px; border: 1px solid #ddd; }
-        input { width: 90%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; }
-        button { width: 100%; background: #000; color: #fff; padding: 10px; border: none; border-radius: 5px; margin-top: 10px; font-size: 18px; cursor: pointer; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f9f9f9; margin: 0; padding-bottom: 80px; }
+        header { background: #000; color: #ff9900; text-align: center; padding: 20px; font-weight: bold; }
+        .item-card { background: #fff; padding: 15px; margin: 10px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .add-btn { background: #ff9900; color: #000; border: none; padding: 8px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; }
         
-        /* هنا التعديل المهم للسلة */
-        #cart-section { 
-            position: fixed; bottom: 0; width: 100%; background: white; 
-            padding: 15px; border-top: 3px solid #ff9900; box-sizing: border-box; 
-            display: none; z-index: 1000;
-        }
-        #cart-items { 
-            max-height: 150px; /* ارتفاع ثابت للسلة */
-            overflow-y: auto;   /* تفعيل التمرير داخل السلة فقط */
-            margin-bottom: 10px;
-            border: 1px solid #eee;
-            padding: 5px;
-        }
+        /* زر السلة العائم */
+        #floating-cart { position: fixed; bottom: 20px; right: 20px; left: 20px; background: #000; color: #fff; padding: 15px; border-radius: 50px; text-align: center; font-weight: bold; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        
+        /* نافذة السلة */
+        #cart-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; }
+        .modal-content { background: white; margin: 20% auto; padding: 20px; width: 80%; border-radius: 15px; }
     </style>
 </head>
 <body>
 
     <header>مطعم مكانك</header>
 
-    <main>
-        <div class="card">
-            <h3 style="margin:0">كريب بانيه</h3>
-            <p style="color: #ff9900; font-weight: bold;">65 ج.م</p>
-            <input type="text" id="note-krep-ban" placeholder="ملاحظة..">
-            <button onclick="addToCart('كريب بانيه', 65, 'note-krep-ban')">إضافة للطلب +</button>
-        </div>
-    </main>
+    <div class="item-card">
+        <div><strong>كريب بانيه</strong><br><small>65 ج.م</small></div>
+        <button class="add-btn" onclick="addToCart('كريب بانيه', 65)">إضافة +</button>
+    </div>
 
-    <div id="cart-section">
-        <div style="display:flex; justify-content:space-between;">
-            <strong>الطلبات:</strong>
-            <button onclick="document.getElementById('cart-section').style.display='none'" style="width:auto; padding:0 10px; margin:0;">إغلاق X</button>
+    <div id="floating-cart" onclick="showModal()">🛒 عرض السلة (0) - 0 ج.م</div>
+
+    <div id="cart-modal">
+        <div class="modal-content">
+            <h2 style="text-align:center">طلبك</h2>
+            <div id="cart-details"></div>
+            <button onclick="sendToWhatsApp()" style="width:100%; background:green; color:white; padding:10px; border:none; border-radius:10px;">إتمام الطلب عبر واتساب</button>
+            <button onclick="hideModal()" style="width:100%; background:#ccc; margin-top:10px; border:none; padding:10px; border-radius:10px;">إغلاق</button>
         </div>
-        <div id="cart-items"></div>
-        <button onclick="sendToWhatsApp()" style="background: green; margin-top:0;">إرسال الطلب واتساب 🛒</button>
     </div>
 
     <script>
         let cart = [];
-        let orderCounter = 1;
-
-        function addToCart(n, p, noteId) {
-            let note = document.getElementById(noteId).value;
-            cart.push({ name: n, price: p, note: note });
-            document.getElementById('cart-section').style.display = 'block';
-            updateUI();
+        function addToCart(name, price) {
+            cart.push({ name, price });
+            updateFloatingBtn();
+        }
+        
+        function updateFloatingBtn() {
+            let total = cart.reduce((sum, item) => sum + item.price, 0);
+            document.getElementById('floating-cart').innerText = `🛒 عرض السلة (${cart.length}) - ${total} ج.م`;
         }
 
-        function updateUI() {
-            let html = "";
-            cart.forEach(item => {
-                html += `<div style="border-bottom: 1px solid #eee; padding: 5px 0; font-size: 14px;">• ${item.name} ${item.note ? '('+item.note+')' : ''}</div>`;
-            });
-            document.getElementById('cart-items').innerHTML = html;
+        function showModal() {
+            document.getElementById('cart-modal').style.display = 'block';
+            let html = cart.map(i => `<p>${i.name} - ${i.price} ج.م</p>`).join('');
+            document.getElementById('cart-details').innerHTML = html;
         }
+
+        function hideModal() { document.getElementById('cart-modal').style.display = 'none'; }
 
         function sendToWhatsApp() {
-            let grouped = {};
-            cart.forEach(item => {
-                if (!grouped[item.name]) grouped[item.name] = { price: item.price, count: 0, notes: [] };
-                grouped[item.name].count++;
-                if (item.note) grouped[item.name].notes.push(item.note);
-            });
-
-            let msg = `🧾 [ بون أوردر جديد ]%0A🏷️ فاتورة: MK${String(orderCounter).padStart(3, '0')}%0A%0A`;
-            let total = 0;
-            Object.keys(grouped).forEach(name => {
-                let item = grouped[name];
-                let itemTotal = item.price * item.count;
-                total += itemTotal;
-                msg += `▪️ *${name}* (العدد: ${item.count})%0A`;
-                item.notes.forEach((n, i) => { msg += `📝 ملاحظة ${i+1}: ${n}%0A`; });
-                msg += `السعر: ${item.price} × ${item.count} = ${itemTotal} ج.م%0A%0A`;
-            });
-            msg += `💰 إجمالي: ${total} ج.م`;
-
-            orderCounter++;
+            let msg = "طلب جديد:%0A" + cart.map(i => i.name).join('%0A');
             window.open('https://wa.me/201021477251?text=' + msg, '_blank');
         }
     </script>
