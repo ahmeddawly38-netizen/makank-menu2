@@ -5,18 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مطعم مكانك</title>
     <style>
-        body { font-family: sans-serif; background: #f4f4f4; margin: 0; padding-bottom: 120px; }
-        header { background: #000; color: #ff9900; text-align: center; padding: 20px; font-weight: bold; font-size: 20px; }
-        .item-card { background: #fff; padding: 15px; margin: 10px; border-radius: 10px; border: 1px solid #ddd; }
-        .price-btn { background: #ff9900; color: #000; padding: 8px 15px; border-radius: 5px; margin: 5px; border: none; cursor: pointer; font-weight:bold; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f4f4; margin: 0; padding-bottom: 120px; }
+        header { background: #000; color: #ff9900; text-align: center; padding: 20px; font-weight: bold; font-size: 22px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .item-card { background: #fff; padding: 15px; margin: 10px; border-radius: 12px; border: 1px solid #ddd; }
+        .price-btn { background: #ff9900; color: #000; padding: 10px 15px; border-radius: 8px; margin: 5px; border: none; cursor: pointer; font-weight:bold; width: 45%; }
+        #toast { display:none; position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#333; color:#fff; padding:12px 25px; border-radius:30px; z-index:9999; font-size:14px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         #floating-cart { position: fixed; bottom: 20px; right: 20px; left: 20px; background: #000; color: #fff; padding: 15px; border-radius: 50px; text-align: center; font-weight: bold; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 1000; }
         #cart-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; overflow-y: auto; }
         .modal-content { background: white; margin: 5% auto; padding: 20px; width: 85%; border-radius: 15px; }
+        input { width: 90%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; }
     </style>
 </head>
 <body>
 
     <header>مطعم مكانك</header>
+    <div id="toast">تمت الإضافة للسلة! ✅</div>
     <div id="menu">جاري تحميل المنيو...</div>
     
     <div id="floating-cart" onclick="showModal()">🛒 عرض الطلبات (0)</div>
@@ -25,8 +28,8 @@
         <div class="modal-content">
             <h2 style="text-align:center">سلة الطلبات</h2>
             <div id="cart-details"></div>
-            <button onclick="sendToWhatsApp()" style="width:100%; background:green; color:white; padding:12px; border:none; border-radius:8px;">إرسال الأوردر واتساب 🚚</button>
-            <button onclick="hideModal()" style="width:100%; background:#ccc; margin-top:10px; border:none; padding:10px; border-radius:8px;">إغلاق</button>
+            <button onclick="sendToWhatsApp()" style="width:100%; background:green; color:white; padding:15px; border:none; border-radius:10px; font-weight:bold; font-size:16px;">إرسال الأوردر واتساب 🚚</button>
+            <button onclick="hideModal()" style="width:100%; background:#ccc; margin-top:10px; border:none; padding:12px; border-radius:10px;">إغلاق</button>
         </div>
     </div>
 
@@ -45,8 +48,8 @@
                     if(!name) return;
                     html += `
                         <div class="item-card">
-                            <h3>${name}</h3>
-                            <input type="text" id="note-${idx}" placeholder="ملاحظات..">
+                            <h3 style="margin:0 0 10px 0;">${name}</h3>
+                            <input type="text" id="note-${idx}" placeholder="ملاحظات (مثل: بدون كاتشب)..">
                             <br>
                             <button class="price-btn" onclick="addToCart('${name}', ${priceMid}, 'وسط', 'note-${idx}')">وسط (${priceMid} ج.م)</button>
                             <button class="price-btn" onclick="addToCart('${name}', ${priceBig}, 'كبير', 'note-${idx}')">كبير (${priceBig} ج.م)</button>
@@ -55,7 +58,7 @@
                 });
                 document.getElementById('menu').innerHTML = html;
             } catch (err) {
-                document.getElementById('menu').innerHTML = "تعذر تحميل المنيو، تأكد من اتصال الإنترنت.";
+                document.getElementById('menu').innerHTML = "تعذر تحميل المنيو، تأكد من الاتصال.";
             }
         }
 
@@ -63,7 +66,10 @@
             let note = document.getElementById(noteId).value;
             cart.push({ name: `${name} (${size})`, price, note });
             updateFloatingBtn();
-            alert("تمت الإضافة للسلة!");
+            
+            let toast = document.getElementById('toast');
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 2000);
         }
 
         function updateFloatingBtn() {
@@ -72,7 +78,7 @@
         }
 
         function showModal() {
-            let html = cart.map((i, idx) => `<p style="border-bottom:1px solid #eee;">${idx+1}. ${i.name} ${i.note ? '('+i.note+')' : ''} - ${i.price} ج.م</p>`).join('');
+            let html = cart.map((i, idx) => `<p style="border-bottom:1px solid #eee; padding:5px;">${idx+1}. ${i.name} ${i.note ? '('+i.note+')' : ''} - ${i.price} ج.م</p>`).join('');
             document.getElementById('cart-details').innerHTML = html || "السلة فارغة";
             document.getElementById('cart-modal').style.display = 'block';
         }
@@ -80,7 +86,7 @@
         function hideModal() { document.getElementById('cart-modal').style.display = 'none'; }
 
         function sendToWhatsApp() {
-            let msg = "طلب جديد من موقع مكانك:%0A%0A" + cart.map(i => `* ${i.name} - ${i.price} ج.م ${i.note ? '('+i.note+')' : ''}`).join('%0A');
+            let msg = "طلب جديد من مطعم مكانك:%0A%0A" + cart.map(i => `▪️ ${i.name} - ${i.price} ج.م ${i.note ? '('+i.note+')' : ''}`).join('%0A');
             window.open('https://wa.me/201013740837?text=' + msg, '_blank');
         }
 
