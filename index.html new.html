@@ -28,6 +28,8 @@
         <div class="modal-content">
             <h2 style="text-align:center">سلة الطلبات</h2>
             <div id="cart-details"></div>
+            <input type="text" id="cust-name" placeholder="اسم العميل...">
+            <input type="text" id="cust-address" placeholder="عنوان التوصيل...">
             <p id="total-price" style="font-weight:bold; text-align:center;"></p>
             <button onclick="sendToWhatsApp()" style="width:100%; background:green; color:white; padding:15px; border:none; border-radius:10px;">إرسال الأوردر واتساب 🚚</button>
             <button onclick="clearCart()" style="width:100%; background:#ff4444; color:white; margin-top:10px; border:none; padding:10px; border-radius:8px;">مسح السلة</button>
@@ -48,16 +50,13 @@
                 const data = await response.text();
                 const rows = data.split('\n').filter(row => row.trim() !== "").slice(1);
                 let html = "";
-                
                 rows.forEach((row, idx) => {
                     const columns = row.split(',');
                     const cat = columns[0];
                     const name = columns[1];
                     const priceMid = columns[2];
                     const priceBig = columns[3];
-
                     if(!name) return;
-                    
                     if (cat !== currentCat) {
                         html += `<div class="cat-title">${cat}</div>`;
                         currentCat = cat;
@@ -73,9 +72,7 @@
                     `;
                 });
                 document.getElementById('menu').innerHTML = html;
-            } catch (err) {
-                document.getElementById('menu').innerHTML = "خطأ في التحميل.";
-            }
+            } catch (err) { document.getElementById('menu').innerHTML = "خطأ في التحميل."; }
         }
 
         function addToCart(name, price, size, noteId) {
@@ -84,7 +81,6 @@
             let existingItem = cart.find(item => item.name === itemName && item.note === note);
             if (existingItem) { existingItem.qty += 1; } 
             else { cart.push({ name: itemName, price: price, note: note, qty: 1 }); }
-            
             localStorage.setItem('myCart', JSON.stringify(cart));
             updateFloatingBtn();
             let toast = document.getElementById('toast');
@@ -112,18 +108,27 @@
         function hideModal() { document.getElementById('cart-modal').style.display = 'none'; }
 
         function sendToWhatsApp() {
+            let name = document.getElementById('cust-name').value;
+            let addr = document.getElementById('cust-address').value;
             let total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            
+            // توليد رقم أوردر عشوائي بسيط أو متسلسل
+            let orderId = "Mk" + Math.floor(Math.random() * 900 + 100); 
+            
             let now = new Date();
             let dateStr = now.toLocaleDateString('ar-EG');
             let timeStr = now.toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'});
 
-            let msg = `*طلب جديد من مطعم مكانك* 🍔%0A`;
+            let msg = `🍔 *طلب جديد من مطعم مكانك*%0A`;
+            msg += `🆔 رقم الطلب: ${orderId}%0A`;
             msg += `--------------------------%0A`;
+            msg += `👤 العميل: ${name || "غير محدد"}%0A`;
+            msg += `📍 العنوان: ${addr || "غير محدد"}%0A`;
             msg += `📅 التاريخ: ${dateStr}%0A`;
             msg += `⏰ الوقت: ${timeStr}%0A`;
             msg += `--------------------------%0A%0A`;
             
-            msg += cart.map(i => `✅ *${i.name}* %0A   الكمية: ${i.qty} | السعر: ${i.price * i.qty} ج.م ${i.note ? '%0A   📝 ملاحظة: ' + i.note : ''}`).join('%0A%0A');
+            msg += cart.map(i => `✅ *${i.name}*%0A   الكمية: ${i.qty} | الحساب: ${i.price} × ${i.qty} = ${i.price * i.qty} ج.م ${i.note ? '%0A   📝 ملاحظة: ' + i.note : ''}`).join('%0A%0A');
             
             msg += `%0A%0A--------------------------%0A`;
             msg += `💰 *إجمالي الحساب: ${total} ج.م*`;
