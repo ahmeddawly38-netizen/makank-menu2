@@ -5,91 +5,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مطعم مكانك</title>
     <style>
-        :root { --primary: #ff9900; --dark: #1a1a1a; --light: #f4f4f4; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--light); margin: 0; padding-top: 70px; padding-bottom: 120px; }
-        header { background: var(--dark); color: var(--primary); text-align: center; padding: 20px; position: fixed; top: 0; width: 100%; z-index: 1000; }
+        :root { --primary: #ff9900; --dark: #1a1a1a; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f4f4; margin: 0; padding-top: 130px; }
+        
+        /* شريط الأقسام الثابت في الأعلى */
+        #nav-tabs { position: fixed; top: 0; width: 100%; background: #fff; display: flex; overflow-x: auto; white-space: nowrap; padding: 10px; border-bottom: 2px solid var(--primary); z-index: 1000; }
+        .tab-btn { background: var(--dark); color: white; padding: 10px 20px; margin: 0 5px; border-radius: 20px; cursor: pointer; font-size: 14px; }
+        
         .cat-title { background: var(--primary); color: #000; padding: 10px; margin: 20px 10px 5px; font-weight:bold; border-radius: 5px; text-align: center; }
-        
-        .item-card { background: #fff; margin: 15px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); overflow: hidden; }
-        .item-img { width: 100%; height: 160px; object-fit: cover; }
+        .item-card { background: #fff; margin: 15px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .item-img { width: 100%; height: 160px; object-fit: cover; border-radius: 15px 15px 0 0; }
         .item-info { padding: 15px; }
-        
-        .price-btn { background: var(--primary); color: #000; padding: 10px; border-radius: 8px; margin: 5px; border: none; cursor: pointer; font-weight:bold; width: 45%; }
-        #floating-cart { position: fixed; bottom: 20px; right: 20px; left: 20px; background: #000; color: #fff; padding: 15px; border-radius: 50px; text-align: center; font-weight: bold; cursor: pointer; z-index: 1000; }
-        #cart-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; overflow-y: auto; }
-        .modal-content { background: white; margin: 5% auto; padding: 20px; width: 85%; border-radius: 15px; }
-        input { width: 90%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; }
+        .price-btn { background: var(--primary); color: #000; padding: 10px; border-radius: 8px; margin: 5px; border: none; font-weight:bold; width: 45%; }
     </style>
 </head>
 <body>
 
-    <header>مطعم مكانك</header>
-    <div id="menu" style="margin-top:20px;">جاري تحميل المنيو...</div>
-    <div id="floating-cart" onclick="showModal()">🛒 عرض الطلبات</div>
+    <!-- شريط الأقسام -->
+    <div id="nav-tabs"></div>
 
-    <div id="cart-modal">
-        <div class="modal-content">
-            <h2 style="text-align:center">سلة الطلبات</h2>
-            <div id="cart-details"></div>
-            <input type="text" id="cust-name" placeholder="اسم العميل...">
-            <input type="text" id="cust-address" placeholder="عنوان التوصيل...">
-            <p id="total-price" style="font-weight:bold; text-align:center;"></p>
-            <button onclick="sendToWhatsApp()" style="width:100%; background:green; color:white; padding:15px; border:none; border-radius:10px;">إرسال الطلب 🚚</button>
-            <button onclick="hideModal()" style="width:100%; background:#ccc; margin-top:10px; border:none; padding:10px; border-radius:8px;">إغلاق</button>
-        </div>
-    </div>
+    <div id="menu">جاري تحميل المنيو...</div>
 
     <script>
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/1Ma5vOPN4iU321SfRkkg1KF3vumXnCpdLExw9e_zw764/export?format=csv";
-        let cart = JSON.parse(localStorage.getItem('myCart')) || [];
-        let currentCat = "";
-
-        async function loadMenu() {
-            try {
-                const response = await fetch(SHEET_URL);
-                const data = await response.text();
-                const rows = data.split('\n').filter(row => row.trim() !== "").slice(1);
-                let html = "";
-                
-                rows.forEach((row, idx) => {
-                    const cols = row.split(',');
-                    const cat = cols[0], name = cols[1], pMid = cols[2], pBig = cols[3], img = cols[4];
-
-                    if (cat !== currentCat) { html += `<div class="cat-title">${cat}</div>`; currentCat = cat; }
-                    
-                    html += `
-                        <div class="item-card">
-                            ${img ? `<img src="${img}" class="item-img" onerror="this.style.display='none'">` : ""}
-                            <div class="item-info">
-                                <h3 style="margin:0 0 10px 0;">${name}</h3>
-                                <input type="text" id="note-${idx}" placeholder="ملاحظات..">
-                                <br>
-                                <button class="price-btn" onclick="addToCart('${name}', ${pMid}, 'وسط', 'note-${idx}')">وسط (${pMid})</button>
-                                <button class="price-btn" onclick="addToCart('${name}', ${pBig}, 'كبير', 'note-${idx}')">كبير (${pBig})</button>
-                            </div>
-                        </div>
-                    `;
-                });
-                document.getElementById('menu').innerHTML = html;
-            } catch (err) { document.getElementById('menu').innerHTML = "حدث خطأ في تحميل البيانات."; }
-        }
-
-        function addToCart(name, price, size, noteId) {
-            let note = document.getElementById(noteId).value;
-            cart.push({ name: `${name} (${size})`, price: price, note: note, qty: 1 });
-            localStorage.setItem('myCart', JSON.stringify(cart));
-            alert("تمت الإضافة للسلة!");
-        }
-
-        function showModal() {
-            document.getElementById('cart-details').innerHTML = cart.map((i, idx) => `<p>${i.name} - ${i.price} ج.م</p>`).join('');
-            document.getElementById('cart-modal').style.display = 'block';
-        }
-        function hideModal() { document.getElementById('cart-modal').style.display = 'none'; }
         
-        function sendToWhatsApp() {
-            let msg = "طلب جديد من مطعم مكانك:%0A" + cart.map(i => i.name).join('%0A');
-            window.open('https://wa.me/201013740837?text=' + msg, '_blank');
+        async function loadMenu() {
+            const response = await fetch(SHEET_URL);
+            const data = await response.text();
+            const rows = data.split('\n').filter(r => r.trim() !== "").slice(1);
+            
+            let html = "";
+            let cats = [];
+            let currentCat = "";
+
+            rows.forEach((row, idx) => {
+                const cols = row.split(',');
+                const cat = cols[0], name = cols[1], pMid = cols[2], pBig = cols[3], img = cols[4];
+                
+                if (!cats.includes(cat)) cats.push(cat);
+
+                if (cat !== currentCat) {
+                    html += `<div id="cat-${cat}" class="cat-title">${cat}</div>`;
+                    currentCat = cat;
+                }
+                
+                html += `
+                    <div class="item-card">
+                        ${img ? `<img src="${img}" class="item-img">` : ""}
+                        <div class="item-info">
+                            <h3>${name}</h3>
+                            <button class="price-btn" onclick="addToCart('${name}', ${pMid})">وسط (${pMid})</button>
+                            <button class="price-btn" onclick="addToCart('${name}', ${pBig})">كبير (${pBig})</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('menu').innerHTML = html;
+
+            // إنشاء أزرار الأقسام
+            document.getElementById('nav-tabs').innerHTML = cats.map(cat => 
+                `<div class="tab-btn" onclick="document.getElementById('cat-${cat}').scrollIntoView({behavior:'smooth'})">${cat}</div>`
+            ).join('');
         }
         loadMenu();
     </script>
