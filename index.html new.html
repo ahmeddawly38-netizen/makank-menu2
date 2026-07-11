@@ -3,41 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مطعم مكانك - المنيو</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <title>مطعم مكانك</title>
     <style>
         :root { --primary: #e60023; --bg: #f8f8f8; }
         body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; padding-bottom: 80px; }
-
-        /* شريط الأقسام */
-        #nav-tabs { background: #fff; display: flex; padding: 15px; gap: 10px; overflow-x: auto; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .tab-btn { background: #f0f0f0; padding: 8px 20px; border-radius: 20px; cursor: pointer; white-space: nowrap; font-weight: bold; border: none; }
-        .tab-btn.active { background: var(--primary); color: white; }
-
-        /* الشبكة (Grid) */
-        #menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; }
         
-        .item-card { background: white; border-radius: 20px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.08); display: flex; flex-direction: column; transition: transform 0.2s; }
+        /* صفحة الترحيب */
+        #welcome-screen { position: fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+        .logo { width: 150px; height: 150px; border-radius: 50%; margin-bottom: 20px; object-fit: cover; border: 3px solid var(--primary); }
+        .start-btn { background: var(--primary); color:white; padding:15px 40px; border-radius:30px; border:none; font-size:1.2rem; cursor:pointer; font-weight:bold; }
+
+        /* المنيو */
+        #menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; margin-top: 10px; }
+        .item-card { background: white; border-radius: 20px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
         .item-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 15px; margin-bottom: 10px; }
-        .item-title { font-weight: bold; font-size: 0.95rem; margin: 5px 0; flex-grow: 1; }
-        
-        .price-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 10px; background: #fff; }
+        .item-title { font-weight: bold; font-size: 0.95rem; margin: 5px 0; }
+        .price-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 10px; }
         .add-btn { background: var(--primary); color: white; border: none; width: 40px; height: 40px; border-radius: 10px; font-size: 20px; font-weight: bold; cursor: pointer; }
 
-        /* شريط سفلي ثابت */
-        #bottom-nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #eee; z-index: 1000; }
+        /* الشريط السفلي */
+        #bottom-nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #eee; z-index: 1000; font-size: 0.8rem; font-weight: bold; }
+        
+        #cart-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; overflow-y: auto; }
+        .modal-content { background: white; margin: 10% auto; padding: 20px; width: 85%; border-radius: 20px; }
     </style>
 </head>
 <body>
 
-    <div id="nav-tabs"></div>
+    <div id="welcome-screen">
+        <img src="ضع_رابط_صورة_اللوجو_هنا.jpg" class="logo" alt="مطعم مكانك">
+        <h1>مطعم مكانك</h1>
+        <p>أطيب الأكلات في العريش</p>
+        <button class="start-btn" onclick="document.getElementById('welcome-screen').style.display='none'">ابدأ الطلب 🍽️</button>
+    </div>
+
     <div id="menu-grid"></div>
 
     <div id="bottom-nav">
-        <span>🏠 الرئيسية</span>
-        <span>🛒 السلة</span>
-        <span style="color:var(--primary)">🍽️ المنيو</span>
-        <span>📍 تتبع</span>
+        <span onclick="location.reload()">🏠 الرئيسية</span>
+        <span onclick="showModal()" id="cart-count" style="cursor:pointer;">🛒 السلة (0)</span>
+        <span onclick="window.scrollTo({top: 0, behavior: 'smooth'});" style="color:var(--primary); cursor:pointer;">🍽️ المنيو</span>
+        <span onclick="window.open('https://wa.me/201013740837', '_blank')" style="cursor:pointer;">📍 تتبع</span>
+    </div>
+
+    <div id="cart-modal">
+        <div class="modal-content">
+            <h2 style="text-align:center">سلة الطلبات</h2>
+            <div id="cart-details" style="margin-bottom:20px;"></div>
+            <button onclick="sendToWhatsApp()" style="width:100%; background:green; color:white; padding:15px; border:none; border-radius:10px;">إرسال الطلب عبر واتساب 🚚</button>
+            <button onclick="document.getElementById('cart-modal').style.display='none'" style="width:100%; background:#ccc; margin-top:10px; border:none; padding:10px; border-radius:10px;">إغلاق</button>
+        </div>
     </div>
 
     <script>
@@ -48,9 +63,8 @@
             const response = await fetch(SHEET_URL);
             const data = await response.text();
             const rows = data.split('\n').filter(r => r.trim() !== "").slice(1);
-            
             let html = "";
-            rows.forEach((row, idx) => {
+            rows.forEach((row) => {
                 const [cat, name, price, , img] = row.split(',');
                 html += `
                     <div class="item-card">
@@ -69,10 +83,25 @@
         function addToCart(name, price) {
             cart.push({ name, price });
             localStorage.setItem('myCart', JSON.stringify(cart));
-            alert("تم إضافة " + name + " للسلة!");
+            updateCartCount();
+        }
+
+        function updateCartCount() {
+            document.getElementById('cart-count').innerText = "🛒 السلة (" + cart.length + ")";
+        }
+
+        function showModal() {
+            document.getElementById('cart-details').innerHTML = cart.map(i => `<p>${i.name} - ${i.price} ج.م</p>`).join('');
+            document.getElementById('cart-modal').style.display = 'block';
+        }
+
+        function sendToWhatsApp() {
+            let msg = "طلب جديد من مطعم مكانك:%0A" + cart.map(i => i.name).join('%0A');
+            window.open('https://wa.me/201013740837?text=' + msg, '_blank');
         }
 
         loadMenu();
+        updateCartCount();
     </script>
 </body>
 </html>
