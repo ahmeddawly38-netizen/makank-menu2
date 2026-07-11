@@ -5,29 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مطعم مكانك</title>
     <style>
-        :root { --primary: #ff9900; --dark: #1a1a1a; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f4f4; margin: 0; padding-top: 130px; }
+        :root { --primary: #ff9900; --dark: #1a1a1a; --light: #f4f4f4; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--light); margin: 0; padding-top: 80px; padding-bottom: 120px; }
         
-        /* شريط الأقسام الثابت في الأعلى */
-        #nav-tabs { position: fixed; top: 0; width: 100%; background: #fff; display: flex; overflow-x: auto; white-space: nowrap; padding: 10px; border-bottom: 2px solid var(--primary); z-index: 1000; }
-        .tab-btn { background: var(--dark); color: white; padding: 10px 20px; margin: 0 5px; border-radius: 20px; cursor: pointer; font-size: 14px; }
+        /* شريط الأقسام العلوي */
+        #nav-tabs { position: fixed; top: 0; width: 100%; background: #000; display: flex; padding: 10px 5px; gap: 10px; overflow-x: auto; z-index: 1000; }
+        .tab-btn { background: #333; color: white; padding: 8px 15px; border-radius: 20px; white-space: nowrap; font-size: 0.9rem; border: 1px solid var(--primary); cursor: pointer; }
         
-        .cat-title { background: var(--primary); color: #000; padding: 10px; margin: 20px 10px 5px; font-weight:bold; border-radius: 5px; text-align: center; }
-        .item-card { background: #fff; margin: 15px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .item-img { width: 100%; height: 160px; object-fit: cover; border-radius: 15px 15px 0 0; }
+        /* الكروت */
+        .item-card { background: white; margin: 15px; border-radius: 20px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border: 1px solid #eee; }
+        .item-img { width: 100%; height: 180px; object-fit: cover; }
         .item-info { padding: 15px; }
-        .price-btn { background: var(--primary); color: #000; padding: 10px; border-radius: 8px; margin: 5px; border: none; font-weight:bold; width: 45%; }
+        .item-title { font-size: 1.2rem; font-weight: bold; color: #222; margin-bottom: 10px; }
+        .price-btns { display: flex; gap: 10px; margin-top: 10px; }
+        .price-btn { flex: 1; background: var(--primary); color: #000; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; }
+        
+        /* السلة والمودال */
+        #floating-cart { position: fixed; bottom: 20px; right: 20px; left: 20px; background: #000; color: #fff; padding: 15px; border-radius: 50px; text-align: center; font-weight: bold; cursor: pointer; z-index: 1000; }
+        #cart-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; overflow-y: auto; }
+        .modal-content { background: white; margin: 5% auto; padding: 20px; width: 85%; border-radius: 15px; }
+        input { width: 90%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; }
     </style>
 </head>
 <body>
 
-    <!-- شريط الأقسام -->
     <div id="nav-tabs"></div>
-
     <div id="menu">جاري تحميل المنيو...</div>
+    <div id="floating-cart" onclick="showModal()">🛒 عرض الطلبات</div>
+
+    <div id="cart-modal">
+        <div class="modal-content">
+            <h2 style="text-align:center">سلة الطلبات</h2>
+            <div id="cart-details"></div>
+            <input type="text" id="cust-name" placeholder="اسم العميل...">
+            <input type="text" id="cust-address" placeholder="عنوان التوصيل...">
+            <p id="total-price" style="font-weight:bold; text-align:center;"></p>
+            <button onclick="sendToWhatsApp()" style="width:100%; background:green; color:white; padding:15px; border:none; border-radius:10px;">إرسال الطلب 🚚</button>
+            <button onclick="hideModal()" style="width:100%; background:#ccc; margin-top:10px; border:none; padding:10px; border-radius:8px;">إغلاق</button>
+        </div>
+    </div>
 
     <script>
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/1Ma5vOPN4iU321SfRkkg1KF3vumXnCpdLExw9e_zw764/export?format=csv";
+        let cart = JSON.parse(localStorage.getItem('myCart')) || [];
         
         async function loadMenu() {
             const response = await fetch(SHEET_URL);
@@ -45,29 +65,47 @@
                 if (!cats.includes(cat)) cats.push(cat);
 
                 if (cat !== currentCat) {
-                    html += `<div id="cat-${cat}" class="cat-title">${cat}</div>`;
+                    html += `<div id="cat-${cat}" style="padding-top:80px;"></div><div class="cat-title" style="background:#ff9900; padding:10px; margin:10px; border-radius:5px; text-align:center; font-weight:bold;">${cat}</div>`;
                     currentCat = cat;
                 }
                 
                 html += `
                     <div class="item-card">
-                        ${img ? `<img src="${img}" class="item-img">` : ""}
+                        ${img ? `<img src="${img}" class="item-img" onerror="this.style.display='none'">` : ""}
                         <div class="item-info">
-                            <h3>${name}</h3>
-                            <button class="price-btn" onclick="addToCart('${name}', ${pMid})">وسط (${pMid})</button>
-                            <button class="price-btn" onclick="addToCart('${name}', ${pBig})">كبير (${pBig})</button>
+                            <div class="item-title">${name}</div>
+                            <div class="price-btns">
+                                <button class="price-btn" onclick="addToCart('${name}', ${pMid}, 'وسط')">وسط (${pMid})</button>
+                                <button class="price-btn" onclick="addToCart('${name}', ${pBig}, 'كبير')">كبير (${pBig})</button>
+                            </div>
                         </div>
                     </div>
                 `;
             });
-            
             document.getElementById('menu').innerHTML = html;
-
-            // إنشاء أزرار الأقسام
             document.getElementById('nav-tabs').innerHTML = cats.map(cat => 
                 `<div class="tab-btn" onclick="document.getElementById('cat-${cat}').scrollIntoView({behavior:'smooth'})">${cat}</div>`
             ).join('');
         }
+
+        function addToCart(name, price, size) {
+            cart.push({ name: `${name} (${size})`, price: price });
+            localStorage.setItem('myCart', JSON.stringify(cart));
+            alert("تمت الإضافة للسلة!");
+        }
+
+        function showModal() {
+            document.getElementById('cart-details').innerHTML = cart.map(i => `<p>${i.name} - ${i.price} ج.م</p>`).join('');
+            document.getElementById('cart-modal').style.display = 'block';
+        }
+
+        function hideModal() { document.getElementById('cart-modal').style.display = 'none'; }
+        
+        function sendToWhatsApp() {
+            let msg = "طلب جديد من مطعم مكانك:%0A" + cart.map(i => i.name).join('%0A');
+            window.open('https://wa.me/201013740837?text=' + msg, '_blank');
+        }
+        
         loadMenu();
     </script>
 </body>
