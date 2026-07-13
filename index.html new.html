@@ -96,12 +96,23 @@
             } catch(e) { document.getElementById('menu-container').innerHTML = "خطأ في تحميل المنيو"; }
         }
 
-        function addToCart(name, price) { cart.push({ name, price }); localStorage.setItem('myCart', JSON.stringify(cart)); alert("تمت الإضافة!"); }
+        // تم حذف الـ alert من هذه الدالة
+        function addToCart(name, price) { 
+            cart.push({ name, price }); 
+            localStorage.setItem('myCart', JSON.stringify(cart)); 
+            updateCartCount(); 
+        }
+
+        function updateCartCount() {
+            document.getElementById('cart-count').innerText = "🛒 السلة (" + cart.length + ")";
+        }
+
         function showModal(id) { document.getElementById(id).style.display = 'block'; }
         function trackOrder() { let val = document.getElementById('order-id').value; if(val) window.open('https://wa.me/201013740837?text=أريد الاستعلام عن طلب رقم: ' + val, '_blank'); }
         function sendToWhatsApp() { window.open('https://wa.me/201013740837?text=لدي طلب جديد من المنيو', '_blank'); }
 
         loadMenu();
+        updateCartCount();
     </script>
 </body>
 </html>
