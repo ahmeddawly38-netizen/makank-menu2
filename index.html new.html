@@ -32,7 +32,7 @@
         /* الشريط السفلي */
         #bottom-nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #eee; z-index: 1000; font-size: 0.85rem; font-weight: bold; color: #555; }
         
-        /* نافذة السلة (المودال) */
+        /* نافذة السلة */
         #cart-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; overflow-y: auto; }
         .modal-content { background: white; margin: 10% auto; padding: 20px; width: 85%; border-radius: 20px; }
         .cart-item { display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
@@ -41,9 +41,9 @@
 <body>
 
     <!-- صفحة الترحيب -->
-    <div id="https://j.top4top.io/p_38460ugbt0.jpg">
-        <!-- ضع رابط صورة اللوجو هنا بدلاً من الرابط الافتراضي -->
-        <img src="https://via.placeholder.com/150/e60023/ffffff?text=مكانك" class="logo" alt="مطعم مكانك">
+    <div id="welcome-screen">
+        <!-- قمت بتصحيح رابط الصورة هنا -->
+        <img src="https://j.top4top.io/p_38460ugbt0.jpg" class="logo" alt="مطعم مكانك">
         <h1 style="margin-bottom: 5px;">مطعم مكانك</h1>
         <p style="color: #666; margin-bottom: 30px;">أطيب الأكلات في العريش</p>
         <button class="start-btn" onclick="document.getElementById('welcome-screen').style.display='none'">ابدأ الطلب 🍽️</button>
@@ -52,7 +52,7 @@
     <!-- شريط الأقسام -->
     <div id="nav-tabs"></div>
 
-    <!-- حاوية المنيو بالكامل -->
+    <!-- حاوية المنيو -->
     <div id="menu-container">جاري تحميل المنيو...</div>
 
     <!-- الشريط السفلي -->
@@ -86,7 +86,6 @@
                 
                 let categoriesData = {};
 
-                // تجميع الأصناف داخل الأقسام الخاصة بها
                 rows.forEach((row) => {
                     const cols = row.split(',');
                     const cat = cols[0], name = cols[1], price = cols[2], img = cols[4];
@@ -100,15 +99,9 @@
                 let html = "";
                 let tabsHtml = "";
 
-                // بناء كود HTML لكل قسم والشبكة الخاصة به
                 for (const cat in categoriesData) {
-                    // بناء الأزرار العلوية
                     tabsHtml += `<button class="tab-btn" onclick="document.getElementById('cat-${cat}').scrollIntoView({behavior:'smooth'})">${cat}</button>`;
-                    
-                    // بناء عنوان القسم
                     html += `<div id="cat-${cat}" class="category-title">${cat}</div>`;
-                    
-                    // بناء شبكة الأصناف لهذا القسم
                     html += `<div class="menu-grid">`;
                     categoriesData[cat].forEach(item => {
                         html += `
@@ -127,9 +120,8 @@
 
                 document.getElementById('menu-container').innerHTML = html;
                 document.getElementById('nav-tabs').innerHTML = tabsHtml;
-
             } catch (error) {
-                document.getElementById('menu-container').innerHTML = "<p style='text-align:center; padding:20px;'>حدث خطأ في تحميل المنيو. يرجى التأكد من اتصال الإنترنت أو رابط جوجل شيت.</p>";
+                document.getElementById('menu-container').innerHTML = "<p style='text-align:center; padding:20px;'>حدث خطأ في تحميل المنيو.</p>";
             }
         }
 
@@ -146,51 +138,28 @@
         function showModal() {
             let detailsHtml = "";
             let total = 0;
-            
             if (cart.length === 0) {
                 detailsHtml = "<p style='text-align:center;'>السلة فارغة حالياً</p>";
             } else {
-                cart.forEach((item, index) => {
-                    detailsHtml += `
-                        <div class="cart-item">
-                            <span>${item.name}</span>
-                            <span style="font-weight:bold;">${item.price} ج.م</span>
-                        </div>
-                    `;
+                cart.forEach((item) => {
+                    detailsHtml += `<div class="cart-item"><span>${item.name}</span><span style="font-weight:bold;">${item.price} ج.م</span></div>`;
                     total += item.price;
                 });
             }
-            
             document.getElementById('cart-details').innerHTML = detailsHtml;
             document.getElementById('cart-total').innerText = total;
             document.getElementById('cart-modal').style.display = 'block';
         }
 
         function sendToWhatsApp() {
-            if (cart.length === 0) {
-                alert("السلة فارغة!");
-                return;
-            }
-            
+            if (cart.length === 0) { alert("السلة فارغة!"); return; }
             let total = cart.reduce((sum, item) => sum + item.price, 0);
             let msg = "أهلاً مطعم مكانك، أريد طلب:%0A%0A";
-            
-            cart.forEach(item => {
-                msg += `- ${item.name} (${item.price} ج.م)%0A`;
-            });
-            
+            cart.forEach(item => { msg += `- ${item.name} (${item.price} ج.م)%0A`; });
             msg += `%0A*الإجمالي: ${total} ج.م*%0A%0Aالرجاء تأكيد الطلب.`;
-            
             window.open('https://wa.me/201013740837?text=' + msg, '_blank');
-            
-            // تفريغ السلة بعد الطلب (اختياري)
-            // cart = [];
-            // localStorage.setItem('myCart', JSON.stringify(cart));
-            // updateCartCount();
-            // document.getElementById('cart-modal').style.display='none';
         }
 
-        // تشغيل الدوال عند فتح الصفحة
         loadMenu();
         updateCartCount();
     </script>
