@@ -9,7 +9,7 @@
         :root { --primary: #e60023; --bg: #f8f8f8; }
         body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; padding-bottom: 90px; }
         
-        /* صفحة الترحيب */
+        /* شاشة الترحيب */
         #welcome-screen { position: fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding: 20px; box-sizing: border-box; }
         .logo { width: 140px; height: 140px; border-radius: 50%; margin-bottom: 20px; object-fit: cover; border: 4px solid var(--primary); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .start-btn { background: var(--primary); color:white; padding:15px 40px; border-radius:30px; border:none; font-size:1.2rem; cursor:pointer; font-weight:bold; box-shadow: 0 4px 10px rgba(230,0,35,0.3); }
@@ -19,10 +19,10 @@
         .tab-btn { background: #f0f0f0; padding: 6px 18px; border-radius: 20px; cursor: pointer; white-space: nowrap; font-weight: bold; border: 1px solid #eee; font-family: 'Cairo', sans-serif; font-size: 0.9rem; }
         
         /* عناوين الأقسام داخل المنيو */
-        .category-title { font-weight: bold; font-size: 1.2rem; padding: 20px 15px 10px; color: #333; scroll-margin-top: 70px; }
+        .category-title { font-weight: bold; font-size: 1.2rem; padding: 20px 15px 10px; color: #333; scroll-margin-top: 70px; text-align: right; }
 
-        /* شبكة الأصناف (عمودين بجانب بعضهما) */
-        .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 15px; }
+        /* شبكة الأصناف (إجبار عمودين بجانب بعضهما) */
+        .menu-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important; padding: 0 10px !important; }
         .item-card { background: white; border-radius: 18px; padding: 10px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between; }
         .item-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 14px; margin-bottom: 8px; background: #eee; }
         .item-title { font-weight: bold; font-size: 0.95rem; margin: 5px 0; color: #222; }
@@ -51,7 +51,7 @@
     <div id="nav-tabs"></div>
 
     <!-- حاوية المنيو -->
-    <div id="menu-container" style="text-align:center; padding:40px; color:#666;">جاري تحميل جميع الأصناف...</div>
+    <div id="menu-container" style="padding:10px 0;">جاري تحميل جميع الأصناف...</div>
 
     <!-- الشريط السفلي -->
     <div id="bottom-nav">
@@ -86,12 +86,9 @@
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/1Ma5vOPN4iU321SfRkkg1KF3vumXnCpdLExw9e_zw764/export?format=csv";
         let cart = JSON.parse(localStorage.getItem('myCart')) || [];
 
-        // دالة محسّنة لضمان قراءة كل سطر به بيانات وتجاوز الأسطر الفارغة تماماً
         function parseCSV(text) {
             let lines = text.split('\n');
             let items = [];
-            
-            // نبدأ من 1 لتخطي سطر العناوين الرئيسي
             for (let i = 1; i < lines.length; i++) {
                 let row = lines[i].trim();
                 if (row === "") continue;
@@ -113,7 +110,6 @@
                 }
                 cols.push(current.trim());
                 
-                // التأكد من وجود القسم واسم الصنف على الأقل لضمان إضافته
                 let cat = cols[0] ? cols[0].replace(/^"|"$/g, '').trim() : "";
                 let name = cols[1] ? cols[1].replace(/^"|"$/g, '').trim() : "";
                 
@@ -136,7 +132,7 @@
                 const items = parseCSV(data);
                 
                 if (items.length === 0) {
-                    document.getElementById('menu-container').innerHTML = "<p>لا توجد أصناف في المنيو حالياً.</p>";
+                    document.getElementById('menu-container').innerHTML = "<p style='text-align:center;'>لا توجد أصناف في المنيو حالياً.</p>";
                     return;
                 }
 
@@ -168,7 +164,7 @@
                 document.getElementById('menu-container').innerHTML = html;
                 document.getElementById('nav-tabs').innerHTML = tabsHtml;
             } catch(e) {
-                document.getElementById('menu-container').innerHTML = "<p style='color:red;'>تعسّر تحميل المنيو، تأكد من الاتصال بالإنترنت.</p>";
+                document.getElementById('menu-container').innerHTML = "<p style='color:red; text-align:center;'>تعسّر تحميل المنيو، تأكد من الاتصال بالإنترنت.</p>";
             }
         }
 
@@ -185,7 +181,7 @@
         function showModal(id) { 
             if (id === 'cart-modal') {
                 let detailsHtml = cart.length === 0 ? "<p style='text-align:center;'>السلة فارغة</p>" : 
-                    cart.map((i, index) => `
+                    cart.map((i) => `
                         <div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid #eee; padding-bottom:5px; font-size:0.95rem;">
                             <span>${i.name}</span>
                             <span style="font-weight:bold; color:var(--primary);">${i.price} ج.م</span>
