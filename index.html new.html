@@ -3,55 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مطعم مكانك</title>
+    <title>مطعم مكانك - العريش</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #e60023; --bg: #f8f8f8; }
-        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; padding-bottom: 80px; }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; padding-bottom: 90px; }
         
         /* صفحة الترحيب */
-        #welcome-screen { position: fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
-        .logo { width: 150px; height: 150px; border-radius: 50%; margin-bottom: 20px; object-fit: cover; border: 3px solid var(--primary); }
-        .start-btn { background: var(--primary); color:white; padding:15px 40px; border-radius:30px; border:none; font-size:1.2rem; cursor:pointer; font-weight:bold; }
+        #welcome-screen { position: fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding: 20px; box-sizing: border-box; }
+        .logo { width: 140px; height: 140px; border-radius: 50%; margin-bottom: 20px; object-fit: cover; border: 4px solid var(--primary); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .start-btn { background: var(--primary); color:white; padding:15px 40px; border-radius:30px; border:none; font-size:1.2rem; cursor:pointer; font-weight:bold; box-shadow: 0 4px 10px rgba(230,0,35,0.3); }
 
-        /* المنيو */
-        #menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; margin-top: 10px; }
-        .item-card { background: white; border-radius: 20px; padding: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
-        .item-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 15px; margin-bottom: 10px; }
-        .item-title { font-weight: bold; font-size: 0.95rem; margin: 5px 0; }
-        .price-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 10px; }
-        .add-btn { background: var(--primary); color: white; border: none; width: 40px; height: 40px; border-radius: 10px; font-size: 20px; font-weight: bold; cursor: pointer; }
-
-        /* الشريط السفلي */
-        #bottom-nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #eee; z-index: 1000; font-size: 0.8rem; font-weight: bold; }
+        /* شريط التنقل العلوي للأقسام */
+        #nav-tabs { background: #fff; display: flex; padding: 12px 15px; gap: 10px; overflow-x: auto; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .tab-btn { background: #f0f0f0; padding: 6px 18px; border-radius: 20px; cursor: pointer; white-space: nowrap; font-weight: bold; border: 1px solid #eee; font-family: 'Cairo', sans-serif; font-size: 0.9rem; }
         
-        #cart-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; overflow-y: auto; }
-        .modal-content { background: white; margin: 10% auto; padding: 20px; width: 85%; border-radius: 20px; }
+        /* عناوين الأقسام داخل المنيو */
+        .category-title { font-weight: bold; font-size: 1.2rem; padding: 20px 15px 10px; color: #333; scroll-margin-top: 70px; }
+
+        /* شبكة الأصناف (عمودين بجانب بعضهما) */
+        .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 15px; }
+        .item-card { background: white; border-radius: 18px; padding: 10px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between; }
+        .item-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 14px; margin-bottom: 8px; background: #eee; }
+        .item-title { font-weight: bold; font-size: 0.95rem; margin: 5px 0; color: #222; }
+        .price-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 2px; margin-top: auto; }
+        .add-btn { background: var(--primary); color: white; border: none; width: 36px; height: 36px; border-radius: 10px; font-size: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+        /* الشريط السفلي الثابت */
+        #bottom-nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #eee; z-index: 1000; font-size: 0.85rem; font-weight: bold; box-sizing: border-box; }
+        
+        /* النوافذ المنبثقة (Modals) */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; overflow-y: auto; }
+        .modal-content { background: white; margin: 15% auto; padding: 20px; width: 85%; max-width: 400px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
 
+    <!-- شاشة الترحيب -->
     <div id="welcome-screen">
-        <img src="ضع_رابط_صورة_اللوجو_هنا.jpg" class="logo" alt="مطعم مكانك">
+        <img src="https://j.top4top.io/p_38460ugbt0.jpg" class="logo" alt="مطعم مكانك">
         <h1>مطعم مكانك</h1>
-        <p>أطيب الأكلات في العريش</p>
+        <p style="color: #666; margin-bottom: 25px;">أطيب الأكلات في العريش 🇪🇬</p>
         <button class="start-btn" onclick="document.getElementById('welcome-screen').style.display='none'">ابدأ الطلب 🍽️</button>
     </div>
 
-    <div id="menu-grid"></div>
+    <!-- أزرار الأقسام العلوية -->
+    <div id="nav-tabs"></div>
 
+    <!-- حاوية المنيو -->
+    <div id="menu-container" style="text-align:center; padding:40px; color:#666;">جاري تحميل الأصناف...</div>
+
+    <!-- الشريط السفلي -->
     <div id="bottom-nav">
-        <span onclick="location.reload()">🏠 الرئيسية</span>
-        <span onclick="showModal()" id="cart-count" style="cursor:pointer;">🛒 السلة (0)</span>
-        <span onclick="window.scrollTo({top: 0, behavior: 'smooth'});" style="color:var(--primary); cursor:pointer;">🍽️ المنيو</span>
-        <span onclick="window.open('https://wa.me/201013740837', '_blank')" style="cursor:pointer;">📍 تتبع</span>
+        <span onclick="window.scrollTo({top: 0, behavior: 'smooth'})" style="cursor:pointer;">🏠 الرئيسية</span>
+        <span onclick="showModal('cart-modal')" id="cart-count" style="cursor:pointer; color:var(--primary);">🛒 السلة (0)</span>
+        <span onclick="window.scrollTo({top: 0, behavior: 'smooth'});" style="cursor:pointer;">🍽️ المنيو</span>
+        <span onclick="showModal('track-modal')" style="cursor:pointer;">📍 تتبع</span>
     </div>
 
-    <div id="cart-modal">
+    <!-- نافذة السلة -->
+    <div id="cart-modal" class="modal">
         <div class="modal-content">
-            <h2 style="text-align:center">سلة الطلبات</h2>
-            <div id="cart-details" style="margin-bottom:20px;"></div>
-            <button onclick="sendToWhatsApp()" style="width:100%; background:green; color:white; padding:15px; border:none; border-radius:10px;">إرسال الطلب عبر واتساب 🚚</button>
-            <button onclick="document.getElementById('cart-modal').style.display='none'" style="width:100%; background:#ccc; margin-top:10px; border:none; padding:10px; border-radius:10px;">إغلاق</button>
+            <h2 style="text-align:center; margin-top:0;">سلة الطلبات</h2>
+            <div id="cart-details" style="max-height: 200px; overflow-y: auto; margin-bottom:15px;"></div>
+            <button onclick="sendToWhatsApp()" style="width:100%; background:#25D366; color:white; padding:12px; border:none; border-radius:10px; font-weight:bold; font-size:1rem; cursor:pointer; margin-bottom: 8px;">إرسال الطلب عبر واتساب 🚚</button>
+            <button onclick="clearCart()" style="width:100%; background:#ff4757; color:white; padding:10px; border:none; border-radius:10px; font-weight:bold; cursor:pointer; margin-bottom: 8px;">مسح السلة</button>
+            <button onclick="document.getElementById('cart-modal').style.display='none'" style="width:100%; background:#eee; color:#333; border:none; padding:10px; border-radius:10px; font-weight:bold; cursor:pointer;">إغلاق</button>
+        </div>
+    </div>
+
+    <!-- نافذة التتبع -->
+    <div id="track-modal" class="modal">
+        <div class="modal-content">
+            <h2 style="text-align:center; margin-top:0;">تتبع طلبك</h2>
+            <input type="text" id="order-id" placeholder="أدخل رقم الطلب أو هاتفك..." style="width:100%; padding:10px; border-radius:10px; border:1px solid #ccc; box-sizing:border-box; margin-bottom:15px; font-family:'Cairo';">
+            <button onclick="trackOrder()" style="width:100%; background:var(--primary); color:white; padding:12px; border:none; border-radius:10px; font-weight:bold; cursor:pointer; margin-bottom: 8px;">استعلام عبر واتساب</button>
+            <button onclick="document.getElementById('track-modal').style.display='none'" style="width:100%; background:#eee; color:#333; border:none; padding:10px; border-radius:10px; font-weight:bold; cursor:pointer;">إغلاق</button>
         </div>
     </div>
 
@@ -59,45 +86,140 @@
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/1Ma5vOPN4iU321SfRkkg1KF3vumXnCpdLExw9e_zw764/export?format=csv";
         let cart = JSON.parse(localStorage.getItem('myCart')) || [];
 
-        async function loadMenu() {
-            const response = await fetch(SHEET_URL);
-            const data = await response.text();
-            const rows = data.split('\n').filter(r => r.trim() !== "").slice(1);
-            let html = "";
-            rows.forEach((row) => {
-                const [cat, name, price, , img] = row.split(',');
-                html += `
-                    <div class="item-card">
-                        <img src="${img}" class="item-img" onerror="this.style.display='none'">
-                        <div class="item-title">${name}</div>
-                        <div class="price-row">
-                            <span style="font-weight:bold">${price} ج.م</span>
-                            <button class="add-btn" onclick="addToCart('${name}', ${price})">+</button>
-                        </div>
-                    </div>
-                `;
-            });
-            document.getElementById('menu-grid').innerHTML = html;
+        // دالة آمنة لتحليل بيانات الـ CSV ومنع مشاكل الفواصل داخل الأسماء
+        function parseCSV(text) {
+            let lines = text.split('\n');
+            let items = [];
+            for (let i = 1; i < lines.length; i++) {
+                let row = lines[i].trim();
+                if (row === "") continue;
+                
+                let cols = [];
+                let current = '';
+                let inQuotes = false;
+                
+                for (let j = 0; j < row.length; j++) {
+                    let char = row[j];
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        cols.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                cols.push(current.trim());
+                
+                if (cols[0] && cols[1]) {
+                    items.push({
+                        cat: cols[0].replace(/^"|"$/g, ''),
+                        name: cols[1].replace(/^"|"$/g, ''),
+                        price: cols[2] ? cols[2].replace(/^"|"$/g, '') : "0",
+                        img: cols[4] ? cols[4].replace(/^"|"$/g, '') : ""
+                    });
+                }
+            }
+            return items;
         }
 
-        function addToCart(name, price) {
-            cart.push({ name, price });
-            localStorage.setItem('myCart', JSON.stringify(cart));
-            updateCartCount();
+        async function loadMenu() {
+            try {
+                const response = await fetch(SHEET_URL);
+                const data = await response.text();
+                const items = parseCSV(data);
+                
+                if (items.length === 0) {
+                    document.getElementById('menu-container').innerHTML = "<p>لا توجد أصناف في المنيو حالياً.</p>";
+                    return;
+                }
+
+                let categoriesData = {};
+                items.forEach(item => {
+                    if (!categoriesData[item.cat]) categoriesData[item.cat] = [];
+                    categoriesData[item.cat].push(item);
+                });
+
+                let html = "", tabsHtml = "";
+                for (const cat in categoriesData) {
+                    tabsHtml += `<button class="tab-btn" onclick="document.getElementById('cat-${cat}').scrollIntoView({behavior:'smooth'})">${cat}</button>`;
+                    html += `<div id="cat-${cat}" class="category-title">${cat}</div><div class="menu-grid">`;
+                    
+                    categoriesData[cat].forEach(item => {
+                        let safeName = item.name.replace(/'/g, "\\'");
+                        html += `
+                            <div class="item-card">
+                                <img src="${item.img}" class="item-img" onerror="this.src='https://via.placeholder.com/150'">
+                                <div class="item-title">${item.name}</div>
+                                <div class="price-row">
+                                    <span style="font-weight:bold; color:var(--primary);">${item.price} ج.م</span>
+                                    <button class="add-btn" onclick="addToCart('${safeName}', '${item.price}')">+</button>
+                                </div>
+                            </div>`;
+                    });
+                    html += `</div>`;
+                }
+                document.getElementById('menu-container').innerHTML = html;
+                document.getElementById('nav-tabs').innerHTML = tabsHtml;
+            } catch(e) {
+                document.getElementById('menu-container').innerHTML = "<p style='color:red;'>تعسّر تحميل المنيو، تأكد من الاتصال بالإنترنت.</p>";
+            }
+        }
+
+        function addToCart(name, price) { 
+            cart.push({ name, price }); 
+            localStorage.setItem('myCart', JSON.stringify(cart)); 
+            updateCartCount(); 
         }
 
         function updateCartCount() {
             document.getElementById('cart-count').innerText = "🛒 السلة (" + cart.length + ")";
         }
 
-        function showModal() {
-            document.getElementById('cart-details').innerHTML = cart.map(i => `<p>${i.name} - ${i.price} ج.م</p>`).join('');
-            document.getElementById('cart-modal').style.display = 'block';
+        function showModal(id) { 
+            if (id === 'cart-modal') {
+                let detailsHtml = cart.length === 0 ? "<p style='text-align:center;'>السلة فارغة</p>" : 
+                    cart.map((i, index) => `
+                        <div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid #eee; padding-bottom:5px; font-size:0.95rem;">
+                            <span>${i.name}</span>
+                            <span style="font-weight:bold; color:var(--primary);">${i.price} ج.م</span>
+                        </div>`).join('');
+                
+                if (cart.length > 0) {
+                    let total = cart.reduce((sum, item) => sum + parseFloat(item.price || 0), 0);
+                    detailsHtml += `<div style="text-align:left; font-weight:bold; margin-top:10px; font-size:1.1rem;">الإجمالي: ${total} ج.م</div>`;
+                }
+                document.getElementById('cart-details').innerHTML = detailsHtml;
+            }
+            document.getElementById(id).style.display = 'block'; 
         }
 
-        function sendToWhatsApp() {
-            let msg = "طلب جديد من مطعم مكانك:%0A" + cart.map(i => i.name).join('%0A');
-            window.open('https://wa.me/201013740837?text=' + msg, '_blank');
+        function clearCart() {
+            cart = [];
+            localStorage.removeItem('myCart');
+            updateCartCount();
+            document.getElementById('cart-details').innerHTML = "<p style='text-align:center;'>السلة فارغة</p>";
+        }
+
+        function trackOrder() { 
+            let val = document.getElementById('order-id').value; 
+            if(val) {
+                window.open('https://wa.me/201013740837?text=أريد الاستعلام عن طلب رقم أو هاتفك: ' + val, '_blank'); 
+            } else {
+                alert("يرجى إدخال رقم الطلب أو الهاتف");
+            }
+        }
+
+        function sendToWhatsApp() { 
+            if(cart.length === 0) {
+                alert("السلة فارغة!");
+                return;
+            }
+            let total = cart.reduce((sum, item) => sum + parseFloat(item.price || 0), 0);
+            let msg = "طلب جديد من مطعم مكانك:%0A-------------------%0A" + 
+                      cart.map(i => `▪️ ${i.name} - ${i.price} ج.م`).join("%0A") + 
+                      `%0A-------------------%0A*الإجمالي الكلي: ${total} ج.م*`;
+            window.open('https://wa.me/201013740837?text=' + msg, '_blank'); 
         }
 
         loadMenu();
