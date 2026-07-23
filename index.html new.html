@@ -49,7 +49,7 @@
     <div id="welcome-screen">
         <img src="https://j.top4top.io/p_38460ugbt0.jpg" class="logo" alt="مطعم مكانك">
         <h1>مطعم مكانك</h1>
-        <p style="color: #666; margin-bottom: 25px;">أطيب الأكلات في العريش 🇪🇬</p>
+        <p style="color: #666; margin-bottom: 25px;"> هو اختيارك الافضل </p>
         <button class="start-btn" id="start-app-btn">ابدأ الطلب 🍽️</button>
     </div>
 
@@ -387,13 +387,13 @@
             updateCartCount();
             document.getElementById('cart-modal').style.display = 'none';
 
-            window.open('https://wa.me/201013740837?text=' + encodeURIComponent(msg).replace(/%250A/g, '%0A'), '_blank');
+            window.open('https://wa.me/201021477251?text=' + encodeURIComponent(msg).replace(/%250A/g, '%0A'), '_blank');
         });
 
         bindSafely('track-whatsapp-btn', () => {
             let val = document.getElementById('order-id').value; 
             if(val) {
-                window.open('https://wa.me/201013740837?text=' + encodeURIComponent('أريد الاستعلام عن طلب رقم أو هاتف: ' + val), '_blank'); 
+                window.open('https://wa.me/201021477251?text=' + encodeURIComponent('أريد الاستعلام عن طلب رقم أو هاتف: ' + val), '_blank'); 
             } else {
                 alert("يرجى إدخال رقم الطلب أو الهاتف");
             }
