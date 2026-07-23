@@ -19,10 +19,10 @@
         .tab-btn { background: #f0f0f0; padding: 6px 18px; border-radius: 20px; cursor: pointer; white-space: nowrap; font-weight: bold; border: 1px solid #eee; font-family: 'Cairo', sans-serif; font-size: 0.9rem; }
         
         /* عناوين الأقسام داخل المنيو */
-        .category-title { font-weight: bold; font-size: 1.2rem; padding: 20px 15px 10px; color: #333; scroll-margin-top: 70px; text-align: right; }
+        .category-title { font-weight: bold; font-size: 1.1rem; padding: 15px 10px 8px; color: var(--primary); width: 100%; grid-column: span 2; text-align: right; border-bottom: 2px solid #eee; margin-top: 10px; }
 
-        /* شبكة الأصناف (إجبار عمودين بجانب بعضهما) */
-        .menu-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important; padding: 0 10px !important; }
+        /* شبكة الأصناف الموحدة (عمودين بجانب بعضهما بدقة) */
+        .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 10px; }
         .item-card { background: white; border-radius: 18px; padding: 10px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between; }
         .item-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 14px; margin-bottom: 8px; background: #eee; }
         .item-title { font-weight: bold; font-size: 0.95rem; margin: 5px 0; color: #222; }
@@ -50,8 +50,8 @@
     <!-- أزرار الأقسام العلوية -->
     <div id="nav-tabs"></div>
 
-    <!-- حاوية المنيو -->
-    <div id="menu-container" style="padding:10px 0;">جاري تحميل جميع الأصناف...</div>
+    <!-- حاوية المنيو الرئيسية -->
+    <div id="menu-container" class="menu-grid">جاري تحميل الأصناف...</div>
 
     <!-- الشريط السفلي -->
     <div id="bottom-nav">
@@ -132,7 +132,7 @@
                 const items = parseCSV(data);
                 
                 if (items.length === 0) {
-                    document.getElementById('menu-container').innerHTML = "<p style='text-align:center;'>لا توجد أصناف في المنيو حالياً.</p>";
+                    document.getElementById('menu-container').innerHTML = "<p style='text-align:center; grid-column: span 2;'>لا توجد أصناف في المنيو حالياً.</p>";
                     return;
                 }
 
@@ -145,7 +145,9 @@
                 let html = "", tabsHtml = "";
                 for (const cat in categoriesData) {
                     tabsHtml += `<button class="tab-btn" onclick="document.getElementById('cat-${cat}').scrollIntoView({behavior:'smooth'})">${cat}</button>`;
-                    html += `<div id="cat-${cat}" class="category-title">${cat}</div><div class="menu-grid">`;
+                    
+                    // عنوان القسم يأخذ عرض الصفيّن معاً
+                    html += `<div id="cat-${cat}" class="category-title">${cat}</div>`;
                     
                     categoriesData[cat].forEach(item => {
                         let safeName = item.name.replace(/'/g, "\\'");
@@ -159,12 +161,11 @@
                                 </div>
                             </div>`;
                     });
-                    html += `</div>`;
                 }
                 document.getElementById('menu-container').innerHTML = html;
                 document.getElementById('nav-tabs').innerHTML = tabsHtml;
             } catch(e) {
-                document.getElementById('menu-container').innerHTML = "<p style='color:red; text-align:center;'>تعسّر تحميل المنيو، تأكد من الاتصال بالإنترنت.</p>";
+                document.getElementById('menu-container').innerHTML = "<p style='color:red; text-align:center; grid-column: span 2;'>تعسّر تحميل المنيو، تأكد من الاتصال بالإنترنت.</p>";
             }
         }
 
