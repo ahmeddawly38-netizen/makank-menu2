@@ -37,7 +37,7 @@
         .price-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 2px; margin-top: auto; }
         .add-btn { background: var(--primary); color: white; border: none; width: 36px; height: 36px; border-radius: 10px; font-size: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-        /* الشريط السفلي الثابت (تم فصله تماماً بجعل الـ pointer-events والطبقات معزولة لتجنب أي حظر من Vercel أو المتصفح) */
+        /* الشريط السفلي الثابت */
         #bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 65px; background: #ffffff; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #ddd; z-index: 2147483647; box-shadow: 0 -4px 15px rgba(0,0,0,0.15); box-sizing: border-box; }
         .nav-btn-tab { background: transparent; border: none; font-family: 'Cairo'; font-size: 0.85rem; font-weight: bold; color: #333; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 25%; height: 100%; -webkit-tap-highlight-color: transparent; }
         .nav-btn-tab:active { background: #eaeaea; }
@@ -48,8 +48,9 @@
 
         /* النوافذ المنبثقة (Modals) */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2147483647; overflow-y: auto; }
-        .modal-content { background: white; margin: 20% auto; padding: 20px; width: 85%; max-width: 400px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
+        .modal-content { background: white; margin: 10% auto; padding: 20px; width: 90%; max-width: 420px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
         .action-btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-bottom: 8px; font-family: 'Cairo'; }
+        .input-field { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #ccc; box-sizing: border-box; margin-bottom: 12px; font-family: 'Cairo'; font-size: 0.95rem; }
     </style>
 </head>
 <body>
@@ -71,7 +72,7 @@
     <!-- رسالة التنبيه السريعة -->
     <div id="toast">تمت إضافة الصنف إلى السلة بنجاح ✨</div>
 
-    <!-- الشريط السفلي (مربوط مباشرة بـ HTML والـ JS بدون تداخل) -->
+    <!-- الشريط السفلي -->
     <div id="bottom-nav">
         <button class="nav-btn-tab" id="nav-home">🏠<span>الرئيسية</span></button>
         <button class="nav-btn-tab" id="nav-cart" style="color:var(--primary);">🛒<span id="cart-text-count">السلة (0)</span></button>
@@ -83,7 +84,25 @@
     <div id="cart-modal" class="modal">
         <div class="modal-content">
             <h2 style="text-align:center; margin-top:0;">سلة الطلبات</h2>
-            <div id="cart-details" style="max-height: 220px; overflow-y: auto; margin-bottom:15px;"></div>
+            <div id="cart-details" style="max-height: 180px; overflow-y: auto; margin-bottom:10px;"></div>
+            
+            <!-- بيانات العميل ونوع الطلب -->
+            <div style="border-top: 1px solid #eee; padding-top: 10px; margin-top: 10px;">
+                <label style="font-size: 0.85rem; font-weight: bold;">اسم العميل:</label>
+                <input type="text" id="cust-name" class="input-field" placeholder="ادخل اسمك الكامل...">
+                
+                <label style="font-size: 0.85rem; font-weight: bold;">نوع الطلب:</label>
+                <select id="order-type" class="input-field">
+                    <option value="دليفري">توصيل دليفري 🛵</option>
+                    <option value="استلام من المطعم">استلام من المطعم 🏪</option>
+                </select>
+
+                <div id="address-box">
+                    <label style="font-size: 0.85rem; font-weight: bold;">العنوان بالتفصيل:</label>
+                    <input type="text" id="cust-address" class="input-field" placeholder="المنطقة، الشارع، رقم الحقة...">
+                </div>
+            </div>
+
             <button class="action-btn" id="whatsapp-btn" style="background:#25D366; color:white;">إرسال الطلب عبر واتساب 🚚</button>
             <button class="action-btn" id="clear-cart-btn" style="background:#ff4757; color:white;">مسح السلة</button>
             <button class="action-btn" id="close-cart-btn" style="background:#eee; color:#333;">إغلاق</button>
@@ -94,7 +113,7 @@
     <div id="track-modal" class="modal">
         <div class="modal-content">
             <h2 style="text-align:center; margin-top:0;">تتبع طلبك</h2>
-            <input type="text" id="order-id" placeholder="أدخل رقم الطلب أو هاتفك..." style="width:100%; padding:10px; border-radius:10px; border:1px solid #ccc; box-sizing:border-box; margin-bottom:15px; font-family:'Cairo';">
+            <input type="text" id="order-id" placeholder="أدخل رقم الطلب أو هاتفك..." class="input-field">
             <button class="action-btn" id="track-whatsapp-btn" style="background:var(--primary); color:white;">استعلام عبر واتساب</button>
             <button class="action-btn" id="close-track-btn" style="background:#eee; color:#333;">إغلاق</button>
         </div>
@@ -105,6 +124,7 @@
         let cart = JSON.parse(localStorage.getItem('myCart')) || [];
         let itemsData = {};
         let selectedSizes = {};
+        const DELIVERY_FEE = 20; // سعر التوصيل الثابت (يمكنك تغييره هنا)
 
         function parseCSV(text) {
             let lines = text.split('\n');
@@ -135,9 +155,7 @@
                 let catCol = cols[0] ? cols[0].replace(/^"|"$/g, '').trim() : "";
                 let name = cols[1] ? cols[1].replace(/^"|"$/g, '').trim() : "";
                 
-                if (catCol !== "") {
-                    currentCat = catCol;
-                }
+                if (catCol !== "") currentCat = catCol;
                 
                 if (name !== "") {
                     items.push({
@@ -229,9 +247,7 @@
                 btn.addEventListener('click', function() {
                     let cat = this.getAttribute('data-cat-target');
                     let targetSection = document.getElementById(`section-${cat}`);
-                    if(targetSection) {
-                        targetSection.scrollIntoView({ behavior: 'smooth' });
-                    }
+                    if(targetSection) targetSection.scrollIntoView({ behavior: 'smooth' });
                     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
                 });
@@ -244,7 +260,6 @@
                     let price = this.getAttribute('data-price');
                     
                     selectedSizes[idx] = { size, price };
-                    
                     document.querySelectorAll(`[data-size-idx="${idx}"]`).forEach(b => b.classList.remove('selected'));
                     this.classList.add('selected');
                     let priceEl = document.getElementById(`price-${idx}`);
@@ -308,7 +323,6 @@
             if(countEl) countEl.innerText = `السلة (${totalQty})`;
         }
 
-        // ربط أزرار الشريط السفلي بالكامل باستخدام click و touchend لضمان الاستجابة الفورية على الموبايل
         const bindSafely = (id, action) => {
             let el = document.getElementById(id);
             if(el) {
@@ -317,34 +331,14 @@
             }
         };
 
-        bindSafely('start-app-btn', () => {
-            document.getElementById('welcome-screen').style.display = 'none';
-        });
-
-        bindSafely('nav-home', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-
-        bindSafely('nav-menu', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-
-        bindSafely('nav-cart', () => {
-            openCartModal();
-        });
-
-        bindSafely('nav-track', () => {
-            document.getElementById('track-modal').style.display = 'block';
-        });
-
-        bindSafely('close-cart-btn', () => {
-            document.getElementById('cart-modal').style.display = 'none';
-        });
-
-        bindSafely('close-track-btn', () => {
-            document.getElementById('track-modal').style.display = 'none';
-        });
-
+        bindSafely('start-app-btn', () => { document.getElementById('welcome-screen').style.display = 'none'; });
+        bindSafely('nav-home', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+        bindSafely('nav-menu', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+        bindSafely('nav-cart', () => { openCartModal(); });
+        bindSafely('nav-track', () => { document.getElementById('track-modal').style.display = 'block'; });
+        bindSafely('close-cart-btn', () => { document.getElementById('cart-modal').style.display = 'none'; });
+        bindSafely('close-track-btn', () => { document.getElementById('track-modal').style.display = 'none'; });
+        
         bindSafely('clear-cart-btn', () => {
             cart = [];
             localStorage.removeItem('myCart');
@@ -352,15 +346,61 @@
             openCartModal();
         });
 
+        // إخفاء/إظهار حقل العنوان حسب نوع الطلب
+        document.getElementById('order-type').addEventListener('change', function() {
+            let addressBox = document.getElementById('address-box');
+            addressBox.style.display = (this.value === 'استلام من المطعم') ? 'none' : 'block';
+        });
+
         bindSafely('whatsapp-btn', () => {
             if(cart.length === 0) {
                 alert("السلة فارغة!");
                 return;
             }
-            let total = cart.reduce((sum, item) => sum + (parseFloat(item.price || 0) * item.qty), 0);
-            let msg = "طلب جديد من مطعم مكانك:%0A-------------------%0A" + 
-                      cart.map(i => `▪️ ${i.name} (${i.size}) × ${i.qty} - ${i.price * i.qty} ج.م`).join("%0A") + 
-                      `%0A-------------------%0A*الإجمالي الكلي: ${total} ج.م*`;
+            let custName = document.getElementById('cust-name').value.trim();
+            if(!custName) {
+                alert("يرجى إدخال اسم العميل أولاً!");
+                document.getElementById('cust-name').focus();
+                return;
+            }
+
+            let orderType = document.getElementById('order-type').value;
+            let custAddress = document.getElementById('cust-address').value.trim();
+            
+            if(orderType === 'دليفري' && !custAddress) {
+                alert("يرجى إدخال عنوان التوصيل بالتفصيل!");
+                document.getElementById('cust-address').focus();
+                return;
+            }
+
+            // توليد رقم فاتورة تسلسلي عشوائي يومي أو محفوظ
+            let invoiceNo = localStorage.getItem('lastInvoiceNo') ? parseInt(localStorage.getItem('lastInvoiceNo')) + 1 : 1;
+            if(invoiceNo > 999) invoiceNo = 1;
+            localStorage.setItem('lastInvoiceNo', invoiceNo);
+            let formattedInvoice = String(invoiceNo).padStart(3, '0');
+
+            // جلب التاريخ والوقت الحالي
+            let now = new Date();
+            let dateStr = now.toISOString().slice(0,10);
+            let timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+            let subTotal = cart.reduce((sum, item) => sum + (parseFloat(item.price || 0) * item.qty), 0);
+            let delivery = (orderType === 'دليفري') ? DELIVERY_FEE : 0;
+            let grandTotal = subTotal + delivery;
+
+            let msg = `🍽️ *طلب جديد من مطعم مكانك*%0A` +
+                      `-----------------------------------------%0A` +
+                      `🧾 *رقم الفاتورة:* #${formattedInvoice}%0A` +
+                      `🕒 *التاريخ والوقت:* ${dateStr} ${timeStr}%0A` +
+                      `👤 *اسم العميل:* ${custName}%0A` +
+                      (orderType === 'دليفري' ? `📍 *العنوان:* ${custAddress}%0A` : ``) +
+                      `🛵 *نوع الطلب:* ${orderType}%0A` +
+                      `-----------------------------------------%0A` +
+                      cart.map(i => `🔹 *${i.name}* [${i.size}]%0A📌 (${i.qty} قطعة × ${i.price} ج.م) = *${i.price * i.qty} ج.م*`).join("%0A") + 
+                      `%0A-----------------------------------------%0A` +
+                      (orderType === 'دليفري' ? `🚚 *رسوم التوصيل:* ${DELIVERY_FEE} ج.م%0A` : ``) +
+                      `✨ *إجمالي الطلب الكلي: ${grandTotal} ج.م*`;
+
             window.open('https://wa.me/201013740837?text=' + msg, '_blank');
         });
 
@@ -376,45 +416,37 @@
         function openCartModal() {
             let detailsHtml = cart.length === 0 ? "<p style='text-align:center;'>السلة فارغة</p>" : 
                 cart.map((i, index) => `
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:8px; font-size:0.95rem;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid #eee; padding-bottom:6px; font-size:0.9rem;">
                         <div>
                             <b>${i.name}</b> (${i.size})<br>
                             <span style="color:var(--primary); font-weight:bold;">${i.price * i.qty} ج.م</span>
                         </div>
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <button class="qty-minus" data-index="${index}" style="background:#ddd; border:none; width:26px; height:26px; border-radius:6px; font-weight:bold; cursor:pointer;">-</button>
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <button class="qty-minus" data-index="${index}" style="background:#ddd; border:none; width:24px; height:24px; border-radius:4px; font-weight:bold; cursor:pointer;">-</button>
                             <span>${i.qty}</span>
-                            <button class="qty-plus" data-index="${index}" style="background:#ddd; border:none; width:26px; height:26px; border-radius:6px; font-weight:bold; cursor:pointer;">+</button>
+                            <button class="qty-plus" data-index="${index}" style="background:#ddd; border:none; width:24px; height:24px; border-radius:4px; font-weight:bold; cursor:pointer;">+</button>
                         </div>
                     </div>`).join('');
             
             if (cart.length > 0) {
-                let total = cart.reduce((sum, item) => sum + (parseFloat(item.price || 0) * item.qty), 0);
-                detailsHtml += `<div style="text-align:left; font-weight:bold; margin-top:12px; font-size:1.1rem; border-top:2px solid #eee; padding-top:8px;">الإجمالي الكلي: ${total} ج.م</div>`;
+                let subTotal = cart.reduce((sum, item) => sum + (parseFloat(item.price || 0) * item.qty), 0);
+                detailsHtml += `<div style="text-align:left; font-weight:bold; margin-top:8px; font-size:1rem; border-top:2px solid #eee; padding-top:6px;">المجموع الفرعي: ${subTotal} ج.م</div>`;
             }
             document.getElementById('cart-details').innerHTML = detailsHtml;
             document.getElementById('cart-modal').style.display = 'block';
 
             document.querySelectorAll('.qty-minus').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    let idx = parseInt(this.getAttribute('data-index'));
-                    changeQty(idx, -1);
-                });
+                btn.addEventListener('click', function() { changeQty(parseInt(this.getAttribute('data-index')), -1); });
             });
 
             document.querySelectorAll('.qty-plus').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    let idx = parseInt(this.getAttribute('data-index'));
-                    changeQty(idx, 1);
-                });
+                btn.addEventListener('click', function() { changeQty(parseInt(this.getAttribute('data-index')), 1); });
             });
         }
 
         function changeQty(index, delta) {
             cart[index].qty += delta;
-            if (cart[index].qty <= 0) {
-                cart.splice(index, 1);
-            }
+            if (cart[index].qty <= 0) cart.splice(index, 1);
             localStorage.setItem('myCart', JSON.stringify(cart));
             updateCartCount();
             openCartModal();
