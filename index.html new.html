@@ -16,23 +16,34 @@
 
         /* شريط التنقل العلوي للأقسام */
         #nav-tabs { background: #fff; display: flex; padding: 12px 15px; gap: 10px; overflow-x: auto; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .tab-btn { background: #f0f0f0; padding: 6px 18px; border-radius: 20px; cursor: pointer; white-space: nowrap; font-weight: bold; border: 1px solid #eee; font-family: 'Cairo', sans-serif; font-size: 0.9rem; }
+        .tab-btn { background: #f0f0f0; padding: 6px 18px; border-radius: 20px; cursor: pointer; white-space: nowrap; font-weight: bold; border: 1px solid #eee; font-family: 'Cairo', sans-serif; font-size: 0.9rem; transition: 0.2s; }
+        .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
         
         /* حاوية القسم الواحد */
         .category-section { margin-bottom: 15px; }
         .category-title { font-weight: bold; font-size: 1.1rem; padding: 15px 15px 8px; color: var(--primary); text-align: right; border-bottom: 2px solid #eee; margin: 0 10px 10px 10px; }
 
-        /* شبكة الأصناف الخاصة بكل قسم على حِدة (تضمن عمودين منظمين تماماً) */
+        /* شبكة الأصناف */
         .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 10px; }
         .item-card { background: white; border-radius: 18px; padding: 10px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between; }
         .item-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 14px; margin-bottom: 8px; background: #eee; }
         .item-title { font-weight: bold; font-size: 0.95rem; margin: 5px 0; color: #222; }
+        
+        /* أزرار اختيار الحجم */
+        .size-selector { display: flex; gap: 5px; margin-bottom: 8px; justify-content: center; }
+        .size-btn { flex: 1; padding: 4px 0; font-size: 0.8rem; border: 1px solid #ddd; background: #f9f9f9; border-radius: 8px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; color: #555; }
+        .size-btn.selected { background: var(--primary); color: white; border-color: var(--primary); }
+
         .price-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 2px; margin-top: auto; }
         .add-btn { background: var(--primary); color: white; border: none; width: 36px; height: 36px; border-radius: 10px; font-size: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
         /* الشريط السفلي الثابت */
         #bottom-nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #eee; z-index: 1000; font-size: 0.85rem; font-weight: bold; box-sizing: border-box; }
         
+        /* رسالة التنبيه السريعة (Toast) */
+        #toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(100px); background: #333; color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; z-index: 3000; transition: 0.3s ease; opacity: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
         /* النوافذ المنبثقة (Modals) */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; overflow-y: auto; }
         .modal-content { background: white; margin: 15% auto; padding: 20px; width: 85%; max-width: 400px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
@@ -54,6 +65,9 @@
     <!-- حاوية المنيو الرئيسية -->
     <div id="menu-container" style="padding-top: 5px;">جاري تحميل الأصناف...</div>
 
+    <!-- رسالة التنبيه السريعة -->
+    <div id="toast">تمت إضافة الصنف إلى السلة بنجاح ✨</div>
+
     <!-- الشريط السفلي -->
     <div id="bottom-nav">
         <span onclick="window.scrollTo({top: 0, behavior: 'smooth'})" style="cursor:pointer;">🏠 الرئيسية</span>
@@ -66,7 +80,7 @@
     <div id="cart-modal" class="modal">
         <div class="modal-content">
             <h2 style="text-align:center; margin-top:0;">سلة الطلبات</h2>
-            <div id="cart-details" style="max-height: 200px; overflow-y: auto; margin-bottom:15px;"></div>
+            <div id="cart-details" style="max-height: 220px; overflow-y: auto; margin-bottom:15px;"></div>
             <button onclick="sendToWhatsApp()" style="width:100%; background:#25D366; color:white; padding:12px; border:none; border-radius:10px; font-weight:bold; font-size:1rem; cursor:pointer; margin-bottom: 8px;">إرسال الطلب عبر واتساب 🚚</button>
             <button onclick="clearCart()" style="width:100%; background:#ff4757; color:white; padding:10px; border:none; border-radius:10px; font-weight:bold; cursor:pointer; margin-bottom: 8px;">مسح السلة</button>
             <button onclick="document.getElementById('cart-modal').style.display='none'" style="width:100%; background:#eee; color:#333; border:none; padding:10px; border-radius:10px; font-weight:bold; cursor:pointer;">إغلاق</button>
@@ -86,10 +100,13 @@
     <script>
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/1Ma5vOPN4iU321SfRkkg1KF3vumXnCpdLExw9e_zw764/export?format=csv";
         let cart = JSON.parse(localStorage.getItem('myCart')) || [];
+        let itemsData = {}; // لتخزين بيانات الأصناف والأسعار حسب الحجم
 
         function parseCSV(text) {
             let lines = text.split('\n');
             let items = [];
+            let currentCat = "";
+            
             for (let i = 1; i < lines.length; i++) {
                 let row = lines[i].trim();
                 if (row === "") continue;
@@ -111,15 +128,20 @@
                 }
                 cols.push(current.trim());
                 
-                let cat = cols[0] ? cols[0].replace(/^"|"$/g, '').trim() : "";
+                let catCol = cols[0] ? cols[0].replace(/^"|"$/g, '').trim() : "";
                 let name = cols[1] ? cols[1].replace(/^"|"$/g, '').trim() : "";
                 
-                if (cat !== "" && name !== "") {
+                if (catCol !== "") {
+                    currentCat = catCol;
+                }
+                
+                if (name !== "") {
                     items.push({
-                        cat: cat,
+                        cat: currentCat || "أصناف أخرى",
                         name: name,
-                        price: cols[2] ? cols[2].replace(/^"|"$/g, '').trim() : "0",
-                        img: cols[4] ? cols[4].replace(/^"|"$/g, '').trim() : ""
+                        priceMid: cols[2] ? cols[2].replace(/^"|"$/g, '').trim() : "", // سعر وسط (العمود C)
+                        priceBig: cols[3] ? cols[3].replace(/^"|"$/g, '').trim() : "", // سعر كبير (العمود D)
+                        img: cols[4] ? cols[4].replace(/^"|"$/g, '').trim() : ""       // رابط الصورة (العمود E)
                     });
                 }
             }
@@ -138,29 +160,49 @@
                 }
 
                 let categoriesData = {};
-                items.forEach(item => {
+                items.forEach((item, index) => {
                     if (!categoriesData[item.cat]) categoriesData[item.cat] = [];
                     categoriesData[item.cat].push(item);
+                    itemsData[index] = item; // حفظ المرجع
                 });
 
                 let html = "", tabsHtml = "";
+                let globalIdx = 0;
+
                 for (const cat in categoriesData) {
-                    tabsHtml += `<button class="tab-btn" onclick="document.getElementById('section-${cat}').scrollIntoView({behavior:'smooth'})">${cat}</button>`;
+                    tabsHtml += `<button class="tab-btn" id="tab-${cat}" onclick="scrollToSection('${cat}')">${cat}</button>`;
                     
-                    // إنشاء قسم مستقل لكل فئة يحتوي على عنوانه وشبكته الخاصة
-                    html += `<div id="section-${cat}" class="category-section">`;
+                    html += `<div id="section-${cat}" class="category-section" data-cat="${cat}">`;
                     html += `<div class="category-title">${cat}</div>`;
                     html += `<div class="menu-grid">`;
                     
                     categoriesData[cat].forEach(item => {
-                        let safeName = item.name.replace(/'/g, "\\'");
+                        let idx = globalIdx++;
+                        let hasMid = item.priceMid !== "" && item.priceMid !== "0";
+                        let hasBig = item.priceBig !== "" && item.priceBig !== "0";
+                        
+                        // تحديد الحجم الافتراضي (الأول المتاح)
+                        let defaultSize = hasMid ? 'وسط' : (hasBig ? 'كبير' : '');
+                        let defaultPrice = hasMid ? item.priceMid : (hasBig ? item.priceBig : "0");
+
                         html += `
                             <div class="item-card">
                                 <img src="${item.img}" class="item-img" onerror="this.src='https://via.placeholder.com/150'">
-                                <div class="item-title">${item.name}</div>
+                                <div class="item-title">${item.name}</div>`;
+                        
+                        // أزرار اختيار الحجم لو وجد أكثر من سعر
+                        if (hasMid && hasBig) {
+                            html += `
+                                <div class="size-selector">
+                                    <button class="size-btn selected" id="btn-mid-${idx}" onclick="changeSize(${idx}, 'وسط', '${item.priceMid}')">وسط</button>
+                                    <button class="size-btn" id="btn-big-${idx}" onclick="changeSize(${idx}, 'كبير', '${item.priceBig}')">كبير</button>
+                                </div>`;
+                        }
+
+                        html += `
                                 <div class="price-row">
-                                    <span style="font-weight:bold; color:var(--primary);">${item.price} ج.م</span>
-                                    <button class="add-btn" onclick="addToCart('${safeName}', '${item.price}')">+</button>
+                                    <span style="font-weight:bold; color:var(--primary);" id="price-${idx}">${defaultPrice} ج.م</span>
+                                    <button class="add-btn" onclick="addItemToCart(${idx}, '${item.name}')">+</button>
                                 </div>
                             </div>`;
                     });
@@ -168,37 +210,104 @@
                 }
                 document.getElementById('menu-container').innerHTML = html;
                 document.getElementById('nav-tabs').innerHTML = tabsHtml;
+                
+                // تحديد أول تاب كنشط
+                let firstCat = Object.keys(categoriesData)[0];
+                if(firstCat) document.getElementById(`tab-${firstCat}`).classList.add('active');
+
             } catch(e) {
                 document.getElementById('menu-container').innerHTML = "<p style='color:red; text-align:center;'>تعسّر تحميل المنيو، تأكد من الاتصال بالإنترنت.</p>";
             }
         }
 
-        function addToCart(name, price) { 
-            cart.push({ name, price }); 
-            localStorage.setItem('myCart', JSON.stringify(cart)); 
-            updateCartCount(); 
+        // حالات الأسعار والأحجام المؤقتة لكل كارت
+        let selectedSizes = {};
+        function changeSize(idx, size, price) {
+            selectedSizes[idx] = { size, price };
+            let isMid = size === 'وسط';
+            document.getElementById(`btn-mid-${idx}`).className = isMid ? "size-btn selected" : "size-btn";
+            document.getElementById(`btn-big-${idx}`).className = !isMid ? "size-btn selected" : "size-btn";
+            document.getElementById(`price-${idx}`).innerText = price + " ج.م";
+        }
+
+        function addItemToCart(idx, name) {
+            let item = itemsData[idx];
+            let hasMid = item.priceMid !== "" && item.priceMid !== "0";
+            let hasBig = item.priceBig !== "" && item.priceBig !== "0";
+            
+            let chosenSize = 'عادي';
+            let chosenPrice = item.priceMid || item.priceBig || "0";
+
+            if (hasMid && hasBig) {
+                if (selectedSizes[idx]) {
+                    chosenSize = selectedSizes[idx].size;
+                    chosenPrice = selectedSizes[idx].price;
+                } else {
+                    chosenSize = 'وسط';
+                    chosenPrice = item.priceMid;
+                }
+            } else if (hasBig && !hasMid) {
+                chosenSize = 'كبير';
+                chosenPrice = item.priceBig;
+            }
+
+            // البحث إذا كان الصنف بنفس الحجم موجود مسبقاً لزيادة الكمية
+            let existing = cart.find(i => i.name === name && i.size === chosenSize);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({ name, size: chosenSize, price: chosenPrice, qty: 1 });
+            }
+
+            localStorage.setItem('myCart', JSON.stringify(cart));
+            updateCartCount();
+            showToast();
+        }
+
+        function showToast() {
+            let toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 2000);
         }
 
         function updateCartCount() {
-            document.getElementById('cart-count').innerText = "🛒 السلة (" + cart.length + ")";
+            let totalQty = cart.reduce((sum, i) => sum + i.qty, 0);
+            document.getElementById('cart-count').innerText = "🛒 السلة (" + totalQty + ")";
         }
 
         function showModal(id) { 
             if (id === 'cart-modal') {
                 let detailsHtml = cart.length === 0 ? "<p style='text-align:center;'>السلة فارغة</p>" : 
-                    cart.map((i) => `
-                        <div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid #eee; padding-bottom:5px; font-size:0.95rem;">
-                            <span>${i.name}</span>
-                            <span style="font-weight:bold; color:var(--primary);">${i.price} ج.م</span>
+                    cart.map((i, index) => `
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:8px; font-size:0.95rem;">
+                            <div>
+                                <b>${i.name}</b> (${i.size})<br>
+                                <span style="color:var(--primary); font-weight:bold;">${i.price * i.qty} ج.م</span>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <button onclick="changeQty(${index}, -1)" style="background:#ddd; border:none; width:26px; height:26px; border-radius:6px; font-weight:bold; cursor:pointer;">-</button>
+                                <span>${i.qty}</span>
+                                <button onclick="changeQty(${index}, 1)" style="background:#ddd; border:none; width:26px; height:26px; border-radius:6px; font-weight:bold; cursor:pointer;">+</button>
+                            </div>
                         </div>`).join('');
                 
                 if (cart.length > 0) {
-                    let total = cart.reduce((sum, item) => sum + parseFloat(item.price || 0), 0);
-                    detailsHtml += `<div style="text-align:left; font-weight:bold; margin-top:10px; font-size:1.1rem;">الإجمالي: ${total} ج.م</div>`;
+                    let total = cart.reduce((sum, item) => sum + (parseFloat(item.price || 0) * item.qty), 0);
+                    detailsHtml += `<div style="text-align:left; font-weight:bold; margin-top:12px; font-size:1.1rem; border-top:2px solid #eee; padding-top:8px;">الإجمالي الكلي: ${total} ج.م</div>`;
                 }
                 document.getElementById('cart-details').innerHTML = detailsHtml;
             }
             document.getElementById(id).style.display = 'block'; 
+        }
+
+        function changeQty(index, delta) {
+            cart[index].qty += delta;
+            if (cart[index].qty <= 0) {
+                cart.splice(index, 1);
+            }
+            localStorage.setItem('myCart', JSON.stringify(cart));
+            updateCartCount();
+            showModal('cart-modal'); // تحديث نافذة السلة فوراً
         }
 
         function clearCart() {
@@ -208,10 +317,17 @@
             document.getElementById('cart-details').innerHTML = "<p style='text-align:center;'>السلة فارغة</p>";
         }
 
+        function scrollToSection(cat) {
+            document.getElementById(`section-${cat}`).scrollIntoView({ behavior: 'smooth' });
+            // تحديث التاب النشط
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`tab-${cat}`).classList.add('active');
+        }
+
         function trackOrder() { 
             let val = document.getElementById('order-id').value; 
             if(val) {
-                window.open('https://wa.me/201013740837?text=أريد الاستعلام عن طلب رقم أو هاتفك: ' + val, '_blank'); 
+                window.open('https://wa.me/201013740837?text=أريد الاستعلام عن طلب رقم أو هاتف: ' + val, '_blank'); 
             } else {
                 alert("يرجى إدخال رقم الطلب أو الهاتف");
             }
@@ -222,9 +338,9 @@
                 alert("السلة فارغة!");
                 return;
             }
-            let total = cart.reduce((sum, item) => sum + parseFloat(item.price || 0), 0);
+            let total = cart.reduce((sum, item) => sum + (parseFloat(item.price || 0) * item.qty), 0);
             let msg = "طلب جديد من مطعم مكانك:%0A-------------------%0A" + 
-                      cart.map(i => `▪️ ${i.name} - ${i.price} ج.م`).join("%0A") + 
+                      cart.map(i => `▪️ ${i.name} (${i.size}) × ${i.qty} - ${i.price * i.qty} ج.م`).join("%0A") + 
                       `%0A-------------------%0A*الإجمالي الكلي: ${total} ج.م*`;
             window.open('https://wa.me/201013740837?text=' + msg, '_blank'); 
         }
