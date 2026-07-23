@@ -9,27 +9,22 @@
         :root { --primary: #e60023; --bg: #f8f8f8; }
         body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; padding-bottom: 100px; }
         
-        /* شاشة الترحيب */
         #welcome-screen { position: fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding: 20px; box-sizing: border-box; }
         .logo { width: 140px; height: 140px; border-radius: 50%; margin-bottom: 20px; object-fit: cover; border: 4px solid var(--primary); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .start-btn { background: var(--primary); color:white; padding:15px 40px; border-radius:30px; border:none; font-size:1.2rem; cursor:pointer; font-weight:bold; box-shadow: 0 4px 10px rgba(230,0,35,0.3); }
 
-        /* شريط التنقل العلوي للأقسام */
         #nav-tabs { background: #fff; display: flex; padding: 12px 15px; gap: 10px; overflow-x: auto; position: sticky; top: 0; z-index: 900; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .tab-btn { background: #f0f0f0; padding: 6px 18px; border-radius: 20px; cursor: pointer; white-space: nowrap; font-weight: bold; border: 1px solid #eee; font-family: 'Cairo', sans-serif; font-size: 0.9rem; transition: 0.2s; }
         .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
         
-        /* حاوية القسم الواحد */
         .category-section { margin-bottom: 15px; }
         .category-title { font-weight: bold; font-size: 1.1rem; padding: 15px 15px 8px; color: var(--primary); text-align: right; border-bottom: 2px solid #eee; margin: 0 10px 10px 10px; }
 
-        /* شبكة الأصناف */
         .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 10px; }
         .item-card { background: white; border-radius: 18px; padding: 10px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between; }
         .item-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 14px; margin-bottom: 8px; background: #eee; }
         .item-title { font-weight: bold; font-size: 0.95rem; margin: 5px 0; color: #222; }
         
-        /* أزرار اختيار الحجم */
         .size-selector { display: flex; gap: 5px; margin-bottom: 8px; justify-content: center; }
         .size-btn { flex: 1; padding: 4px 0; font-size: 0.8rem; border: 1px solid #ddd; background: #f9f9f9; border-radius: 8px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; color: #555; }
         .size-btn.selected { background: var(--primary); color: white; border-color: var(--primary); }
@@ -37,16 +32,12 @@
         .price-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 2px; margin-top: auto; }
         .add-btn { background: var(--primary); color: white; border: none; width: 36px; height: 36px; border-radius: 10px; font-size: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-        /* الشريط السفلي الثابت */
         #bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 65px; background: #ffffff; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #ddd; z-index: 2147483647; box-shadow: 0 -4px 15px rgba(0,0,0,0.15); box-sizing: border-box; }
         .nav-btn-tab { background: transparent; border: none; font-family: 'Cairo'; font-size: 0.85rem; font-weight: bold; color: #333; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 25%; height: 100%; -webkit-tap-highlight-color: transparent; }
-        .nav-btn-tab:active { background: #eaeaea; }
         
-        /* رسالة التنبيه السريعة (Toast) */
         #toast { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%) translateY(100px); background: #333; color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; z-index: 2147483646; transition: 0.3s ease; opacity: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-        /* النوافذ المنبثقة (Modals) */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2147483647; overflow-y: auto; }
         .modal-content { background: white; margin: 10% auto; padding: 20px; width: 90%; max-width: 420px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
         .action-btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-bottom: 8px; font-family: 'Cairo'; }
@@ -55,7 +46,6 @@
 </head>
 <body>
 
-    <!-- شاشة الترحيب -->
     <div id="welcome-screen">
         <img src="https://j.top4top.io/p_38460ugbt0.jpg" class="logo" alt="مطعم مكانك">
         <h1>مطعم مكانك</h1>
@@ -63,16 +53,10 @@
         <button class="start-btn" id="start-app-btn">ابدأ الطلب 🍽️</button>
     </div>
 
-    <!-- أزرار الأقسام العلوية -->
     <div id="nav-tabs"></div>
-
-    <!-- حاوية المنيو الرئيسية -->
     <div id="menu-container" style="padding-top: 5px;">جاري تحميل الأصناف...</div>
-
-    <!-- رسالة التنبيه السريعة -->
     <div id="toast">تمت إضافة الصنف إلى السلة بنجاح ✨</div>
 
-    <!-- الشريط السفلي -->
     <div id="bottom-nav">
         <button class="nav-btn-tab" id="nav-home">🏠<span>الرئيسية</span></button>
         <button class="nav-btn-tab" id="nav-cart" style="color:var(--primary);">🛒<span id="cart-text-count">السلة (0)</span></button>
@@ -80,13 +64,11 @@
         <button class="nav-btn-tab" id="nav-track">📍<span>تتبع</span></button>
     </div>
 
-    <!-- نافذة السلة -->
     <div id="cart-modal" class="modal">
         <div class="modal-content">
             <h2 style="text-align:center; margin-top:0;">سلة الطلبات</h2>
             <div id="cart-details" style="max-height: 180px; overflow-y: auto; margin-bottom:10px;"></div>
             
-            <!-- بيانات العميل ونوع الطلب -->
             <div style="border-top: 1px solid #eee; padding-top: 10px; margin-top: 10px;">
                 <label style="font-size: 0.85rem; font-weight: bold;">اسم العميل:</label>
                 <input type="text" id="cust-name" class="input-field" placeholder="ادخل اسمك الكامل...">
@@ -109,7 +91,6 @@
         </div>
     </div>
 
-    <!-- نافذة التتبع -->
     <div id="track-modal" class="modal">
         <div class="modal-content">
             <h2 style="text-align:center; margin-top:0;">تتبع طلبك</h2>
@@ -124,7 +105,7 @@
         let cart = JSON.parse(localStorage.getItem('myCart')) || [];
         let itemsData = {};
         let selectedSizes = {};
-        const DELIVERY_FEE = 20; // سعر التوصيل الثابت (يمكنك تغييره هنا)
+        const DELIVERY_FEE = 20;
 
         function parseCSV(text) {
             let lines = text.split('\n');
@@ -346,7 +327,6 @@
             openCartModal();
         });
 
-        // إخفاء/إظهار حقل العنوان حسب نوع الطلب
         document.getElementById('order-type').addEventListener('change', function() {
             let addressBox = document.getElementById('address-box');
             addressBox.style.display = (this.value === 'استلام من المطعم') ? 'none' : 'block';
@@ -373,13 +353,11 @@
                 return;
             }
 
-            // توليد رقم فاتورة تسلسلي عشوائي يومي أو محفوظ
             let invoiceNo = localStorage.getItem('lastInvoiceNo') ? parseInt(localStorage.getItem('lastInvoiceNo')) + 1 : 1;
             if(invoiceNo > 999) invoiceNo = 1;
             localStorage.setItem('lastInvoiceNo', invoiceNo);
             let formattedInvoice = String(invoiceNo).padStart(3, '0');
 
-            // جلب التاريخ والوقت الحالي
             let now = new Date();
             let dateStr = now.toISOString().slice(0,10);
             let timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
@@ -387,6 +365,8 @@
             let subTotal = cart.reduce((sum, item) => sum + (parseFloat(item.price || 0) * item.qty), 0);
             let delivery = (orderType === 'دليفري') ? DELIVERY_FEE : 0;
             let grandTotal = subTotal + delivery;
+
+            let itemsText = cart.map(i => `🔹 *${i.name}* [${i.size}]%0A📌 (${i.qty} قطعة × ${i.price} ج.م) = *${i.price * i.qty} ج.م*`).join("%0A");
 
             let msg = `🍽️ *طلب جديد من مطعم مكانك*%0A` +
                       `-----------------------------------------%0A` +
@@ -396,18 +376,24 @@
                       (orderType === 'دليفري' ? `📍 *العنوان:* ${custAddress}%0A` : ``) +
                       `🛵 *نوع الطلب:* ${orderType}%0A` +
                       `-----------------------------------------%0A` +
-                      cart.map(i => `🔹 *${i.name}* [${i.size}]%0A📌 (${i.qty} قطعة × ${i.price} ج.م) = *${i.price * i.qty} ج.م*`).join("%0A") + 
+                      itemsText + 
                       `%0A-----------------------------------------%0A` +
                       (orderType === 'دليفري' ? `🚚 *رسوم التوصيل:* ${DELIVERY_FEE} ج.م%0A` : ``) +
                       `✨ *إجمالي الطلب الكلي: ${grandTotal} ج.م*`;
 
-            window.open('https://wa.me/201013740837?text=' + msg, '_blank');
+            // تفريغ السلة تماماً بعد الضغط على إرسال وطباعتها
+            cart = [];
+            localStorage.removeItem('myCart');
+            updateCartCount();
+            document.getElementById('cart-modal').style.display = 'none';
+
+            window.open('https://wa.me/201013740837?text=' + encodeURIComponent(msg).replace(/%250A/g, '%0A'), '_blank');
         });
 
         bindSafely('track-whatsapp-btn', () => {
             let val = document.getElementById('order-id').value; 
             if(val) {
-                window.open('https://wa.me/201013740837?text=أريد الاستعلام عن طلب رقم أو هاتف: ' + val, '_blank'); 
+                window.open('https://wa.me/201013740837?text=' + encodeURIComponent('أريد الاستعلام عن طلب رقم أو هاتف: ' + val), '_blank'); 
             } else {
                 alert("يرجى إدخال رقم الطلب أو الهاتف");
             }
