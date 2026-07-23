@@ -18,11 +18,12 @@
         #nav-tabs { background: #fff; display: flex; padding: 12px 15px; gap: 10px; overflow-x: auto; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .tab-btn { background: #f0f0f0; padding: 6px 18px; border-radius: 20px; cursor: pointer; white-space: nowrap; font-weight: bold; border: 1px solid #eee; font-family: 'Cairo', sans-serif; font-size: 0.9rem; }
         
-        /* عناوين الأقسام داخل المنيو */
-        .category-title { font-weight: bold; font-size: 1.1rem; padding: 15px 10px 8px; color: var(--primary); width: 100%; grid-column: span 2; text-align: right; border-bottom: 2px solid #eee; margin-top: 10px; }
+        /* حاوية القسم الواحد */
+        .category-section { margin-bottom: 15px; }
+        .category-title { font-weight: bold; font-size: 1.1rem; padding: 15px 15px 8px; color: var(--primary); text-align: right; border-bottom: 2px solid #eee; margin: 0 10px 10px 10px; }
 
-        /* شبكة الأصناف الموحدة (عمودين بجانب بعضهما بدقة) */
-        .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 10px; }
+        /* شبكة الأصناف الخاصة بكل قسم على حِدة (تضمن عمودين منظمين تماماً) */
+        .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 10px; }
         .item-card { background: white; border-radius: 18px; padding: 10px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between; }
         .item-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 14px; margin-bottom: 8px; background: #eee; }
         .item-title { font-weight: bold; font-size: 0.95rem; margin: 5px 0; color: #222; }
@@ -51,7 +52,7 @@
     <div id="nav-tabs"></div>
 
     <!-- حاوية المنيو الرئيسية -->
-    <div id="menu-container" class="menu-grid">جاري تحميل الأصناف...</div>
+    <div id="menu-container" style="padding-top: 5px;">جاري تحميل الأصناف...</div>
 
     <!-- الشريط السفلي -->
     <div id="bottom-nav">
@@ -132,7 +133,7 @@
                 const items = parseCSV(data);
                 
                 if (items.length === 0) {
-                    document.getElementById('menu-container').innerHTML = "<p style='text-align:center; grid-column: span 2;'>لا توجد أصناف في المنيو حالياً.</p>";
+                    document.getElementById('menu-container').innerHTML = "<p style='text-align:center;'>لا توجد أصناف في المنيو حالياً.</p>";
                     return;
                 }
 
@@ -144,10 +145,12 @@
 
                 let html = "", tabsHtml = "";
                 for (const cat in categoriesData) {
-                    tabsHtml += `<button class="tab-btn" onclick="document.getElementById('cat-${cat}').scrollIntoView({behavior:'smooth'})">${cat}</button>`;
+                    tabsHtml += `<button class="tab-btn" onclick="document.getElementById('section-${cat}').scrollIntoView({behavior:'smooth'})">${cat}</button>`;
                     
-                    // عنوان القسم يأخذ عرض الصفيّن معاً
-                    html += `<div id="cat-${cat}" class="category-title">${cat}</div>`;
+                    // إنشاء قسم مستقل لكل فئة يحتوي على عنوانه وشبكته الخاصة
+                    html += `<div id="section-${cat}" class="category-section">`;
+                    html += `<div class="category-title">${cat}</div>`;
+                    html += `<div class="menu-grid">`;
                     
                     categoriesData[cat].forEach(item => {
                         let safeName = item.name.replace(/'/g, "\\'");
@@ -161,11 +164,12 @@
                                 </div>
                             </div>`;
                     });
+                    html += `</div></div>`;
                 }
                 document.getElementById('menu-container').innerHTML = html;
                 document.getElementById('nav-tabs').innerHTML = tabsHtml;
             } catch(e) {
-                document.getElementById('menu-container').innerHTML = "<p style='color:red; text-align:center; grid-column: span 2;'>تعسّر تحميل المنيو، تأكد من الاتصال بالإنترنت.</p>";
+                document.getElementById('menu-container').innerHTML = "<p style='color:red; text-align:center;'>تعسّر تحميل المنيو، تأكد من الاتصال بالإنترنت.</p>";
             }
         }
 
