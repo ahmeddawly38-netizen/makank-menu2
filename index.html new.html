@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #e60023; --bg: #f8f8f8; }
-        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; padding-bottom: 90px; }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; padding-bottom: 100px; }
         
         /* شاشة الترحيب */
         #welcome-screen { position: fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding: 20px; box-sizing: border-box; }
@@ -37,16 +37,17 @@
         .price-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 2px; margin-top: auto; }
         .add-btn { background: var(--primary); color: white; border: none; width: 36px; height: 36px; border-radius: 10px; font-size: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-        /* الشريط السفلي الثابت (تم رفع الـ z-index ليكون فوق كل العناصر) */
-        #bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #eee; z-index: 2500; font-size: 0.85rem; font-weight: bold; box-sizing: border-box; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); }
-        .nav-item { cursor: pointer; padding: 5px 10px; text-align: center; }
+        /* الشريط السفلي الثابت مع ضمان استجابته بالكامل */
+        #bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 65px; background: white; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #ddd; z-index: 99999; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); box-sizing: border-box; }
+        .nav-btn-tab { background: none; border: none; font-family: 'Cairo'; font-size: 0.9rem; font-weight: bold; color: #333; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 25%; height: 100%; }
+        .nav-btn-tab:active { background: #f2f2f2; }
         
         /* رسالة التنبيه السريعة (Toast) */
-        #toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(100px); background: #333; color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; z-index: 3000; transition: 0.3s ease; opacity: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        #toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(100px); background: #333; color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; z-index: 100000; transition: 0.3s ease; opacity: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
         /* النوافذ المنبثقة (Modals) */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 3500; overflow-y: auto; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100001; overflow-y: auto; }
         .modal-content { background: white; margin: 20% auto; padding: 20px; width: 85%; max-width: 400px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
     </style>
 </head>
@@ -69,12 +70,12 @@
     <!-- رسالة التنبيه السريعة -->
     <div id="toast">تمت إضافة الصنف إلى السلة بنجاح ✨</div>
 
-    <!-- الشريط السفلي (مع تفعيل الأزرار بشكل صريح) -->
+    <!-- الشريط السفلي (تم تحويله لأزرار صريحة لضمان الاستجابة باللمس والضغط) -->
     <div id="bottom-nav">
-        <div class="nav-item" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">🏠 الرئيسية</div>
-        <div class="nav-item" onclick="showModal('cart-modal')" id="cart-count" style="color:var(--primary);">🛒 السلة (0)</div>
-        <div class="nav-item" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">🍽️ المنيو</div>
-        <div class="nav-item" onclick="showModal('track-modal')">📍 تتبع</div>
+        <button class="nav-btn-tab" onclick="goHome()">🏠<span style="font-size:0.75rem;">الرئيسية</span></button>
+        <button class="nav-btn-tab" onclick="openCartModal()" style="color:var(--primary);" id="cart-count">🛒<span style="font-size:0.75rem;">السلة (0)</span></button>
+        <button class="nav-btn-tab" onclick="goHome()">🍽️<span style="font-size:0.75rem;">المنيو</span></button>
+        <button class="nav-btn-tab" onclick="openTrackModal()">📍<span style="font-size:0.75rem;">تتبع</span></button>
     </div>
 
     <!-- نافذة السلة -->
@@ -267,32 +268,38 @@
 
         function updateCartCount() {
             let totalQty = cart.reduce((sum, i) => sum + i.qty, 0);
-            document.getElementById('cart-count').innerText = "🛒 السلة (" + totalQty + ")";
+            document.getElementById('cart-count').innerHTML = `🛒<span style="font-size:0.75rem;">السلة (${totalQty})</span>`;
         }
 
-        function showModal(id) { 
-            if (id === 'cart-modal') {
-                let detailsHtml = cart.length === 0 ? "<p style='text-align:center;'>السلة فارغة</p>" : 
-                    cart.map((i, index) => `
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:8px; font-size:0.95rem;">
-                            <div>
-                                <b>${i.name}</b> (${i.size})<br>
-                                <span style="color:var(--primary); font-weight:bold;">${i.price * i.qty} ج.م</span>
-                            </div>
-                            <div style="display:flex; align-items:center; gap:8px;">
-                                <button onclick="changeQty(${index}, -1)" style="background:#ddd; border:none; width:26px; height:26px; border-radius:6px; font-weight:bold; cursor:pointer;">-</button>
-                                <span>${i.qty}</span>
-                                <button onclick="changeQty(${index}, 1)" style="background:#ddd; border:none; width:26px; height:26px; border-radius:6px; font-weight:bold; cursor:pointer;">+</button>
-                            </div>
-                        </div>`).join('');
-                
-                if (cart.length > 0) {
-                    let total = cart.reduce((sum, item) => sum + (parseFloat(item.price || 0) * item.qty), 0);
-                    detailsHtml += `<div style="text-align:left; font-weight:bold; margin-top:12px; font-size:1.1rem; border-top:2px solid #eee; padding-top:8px;">الإجمالي الكلي: ${total} ج.م</div>`;
-                }
-                document.getElementById('cart-details').innerHTML = detailsHtml;
+        function goHome() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function openCartModal() {
+            let detailsHtml = cart.length === 0 ? "<p style='text-align:center;'>السلة فارغة</p>" : 
+                cart.map((i, index) => `
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:8px; font-size:0.95rem;">
+                        <div>
+                            <b>${i.name}</b> (${i.size})<br>
+                            <span style="color:var(--primary); font-weight:bold;">${i.price * i.qty} ج.م</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <button onclick="changeQty(${index}, -1)" style="background:#ddd; border:none; width:26px; height:26px; border-radius:6px; font-weight:bold; cursor:pointer;">-</button>
+                            <span>${i.qty}</span>
+                            <button onclick="changeQty(${index}, 1)" style="background:#ddd; border:none; width:26px; height:26px; border-radius:6px; font-weight:bold; cursor:pointer;">+</button>
+                        </div>
+                    </div>`).join('');
+            
+            if (cart.length > 0) {
+                let total = cart.reduce((sum, item) => sum + (parseFloat(item.price || 0) * item.qty), 0);
+                detailsHtml += `<div style="text-align:left; font-weight:bold; margin-top:12px; font-size:1.1rem; border-top:2px solid #eee; padding-top:8px;">الإجمالي الكلي: ${total} ج.م</div>`;
             }
-            document.getElementById(id).style.display = 'block'; 
+            document.getElementById('cart-details').innerHTML = detailsHtml;
+            document.getElementById('cart-modal').style.display = 'block';
+        }
+
+        function openTrackModal() {
+            document.getElementById('track-modal').style.display = 'block';
         }
 
         function closeModal(id) {
@@ -306,7 +313,7 @@
             }
             localStorage.setItem('myCart', JSON.stringify(cart));
             updateCartCount();
-            showModal('cart-modal');
+            openCartModal();
         }
 
         function clearCart() {
