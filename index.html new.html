@@ -56,6 +56,33 @@
 
     <div id="nav-tabs"></div>
     <div id="menu-container" style="padding-top: 5px; text-align: center; padding-top: 40px;">جاري تحميل الأصناف...</div>
+    
+    <!-- تذييل الموقع (Footer) -->
+    <footer style="background: #222; color: #fff; padding: 25px 15px; text-align: center; margin-top: 30px; border-top: 4px solid var(--primary); font-family: 'Cairo', sans-serif;">
+        <div style="max-width: 600px; margin: 0 auto;">
+            <h3 style="margin: 0 0 10px 0; font-size: 1.2rem; color: #fff;">مطعم مكانك 🍽️</h3>
+            <p style="font-size: 0.85rem; color: #bbb; margin: 0 0 15px 0;">أفضل المأكولات - العريش، أبو صقيل</p>
+            
+            <!-- أرقام التواصل -->
+            <div style="margin-bottom: 15px; font-size: 0.9rem;">
+                📞 تواصل معنا: <a href="tel:201021477251" style="color: #25D366; text-decoration: none; font-weight: bold;" dir="ltr">01021477251</a>
+            </div>
+
+            <!-- روابط السوشيال ميديا -->
+            <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 20px;">
+                <a href="https://wa.me/201021477251" target="_blank" style="background: #25D366; color: white; padding: 6px 15px; border-radius: 20px; text-decoration: none; font-size: 0.85rem; font-weight: bold;">واتساب</a>
+                <a href="https://www.facebook.com" target="_blank" style="background: #1877F2; color: white; padding: 6px 15px; border-radius: 20px; text-decoration: none; font-size: 0.85rem; font-weight: bold;">فيسبوك</a>
+                <a href="https://www.tiktok.com" target="_blank" style="background: #000; color: white; padding: 6px 15px; border-radius: 20px; text-decoration: none; font-size: 0.85rem; font-weight: bold; border: 1px solid #444;">تيك توك</a>
+            </div>
+
+            <!-- حقوق النشر واسم المطور -->
+            <div style="border-top: 1px solid #444; padding-top: 12px; font-size: 0.8rem; color: #888;">
+                جميع الحقوق محفوظة © 2026 لمطعم مكانك <br>
+                <span style="color: #bbb; margin-top: 4px; display: inline-block;">تم التطوير بواسطة: <strong style="color: var(--primary);">عاطف القدري</strong></span>
+            </div>
+        </div>
+    </footer>
+
     <div id="toast">تمت إضافة الصنف إلى السلة بنجاح ✨</div>
 
     <div id="bottom-nav">
@@ -108,7 +135,6 @@
         let selectedSizes = {};
         const DELIVERY_FEE = 10;
 
-        // استرجاع بيانات العميل المحفوظة سابقاً لتسهيل الطلب
         window.addEventListener('DOMContentLoaded', () => {
             if(localStorage.getItem('savedCustName')) {
                 document.getElementById('cust-name').value = localStorage.getItem('savedCustName');
@@ -364,7 +390,6 @@
                 return;
             }
 
-            // حفظ بيانات العميل للمرة القادمة
             localStorage.setItem('savedCustName', custName);
             localStorage.setItem('savedCustAddress', custAddress);
 
