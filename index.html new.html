@@ -13,11 +13,11 @@
         .logo { width: 140px; height: 140px; border-radius: 50%; margin-bottom: 20px; object-fit: cover; border: 4px solid var(--primary); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .start-btn { background: var(--primary); color:white; padding:15px 40px; border-radius:30px; border:none; font-size:1.2rem; cursor:pointer; font-weight:bold; box-shadow: 0 4px 10px rgba(230,0,35,0.3); }
 
-        /* تنسيق الشريط المتحرك (Slider) للأكثر طلباً */
+        /* تنسيق الشريط المتحرك (Slider) للأكثر طلباً بدون فراغات */
         .slider-section { background: #fff; padding: 15px 0; border-bottom: 3px solid #ffcc00; margin-bottom: 10px; overflow: hidden; }
         .slider-title { font-weight: bold; font-size: 1.1rem; color: #d4a017; padding: 0 15px 10px 15px; text-align: right; display: flex; align-items: center; gap: 5px; }
         .slider-track-container { width: 100%; overflow: hidden; position: relative; }
-        .slider-track { display: flex; gap: 12px; width: max-content; animation: scrollSlider 25s linear infinite; padding: 5px 15px; }
+        .slider-track { display: flex; gap: 12px; width: max-content; animation: scrollSlider 20s linear infinite; padding: 5px 15px; }
         .slider-track:hover { animation-play-state: paused; }
 
         @keyframes scrollSlider {
@@ -79,7 +79,6 @@
     <div id="nav-tabs"></div>
     <div id="menu-container" style="padding-top: 5px; text-align: center; padding-top: 20px;">جاري تحميل الأصناف...</div>
     
-    <!-- تذييل الموقع (Footer) -->
     <footer style="background: #222; color: #fff; padding: 25px 15px; text-align: center; margin-top: 30px; border-top: 4px solid var(--primary); font-family: 'Cairo', sans-serif;">
         <div style="max-width: 600px; margin: 0 auto;">
             <h3 style="margin: 0 0 10px 0; font-size: 1.2rem; color: #fff;">مطعم مكانك 🍽️</h3>
@@ -224,19 +223,20 @@
                 let categoriesData = {};
                 let featuredItems = [];
 
-                items.forEach((item, index) => {
-                    if (!categoriesData[item.cat]) categoriesData[item.cat] = [];
-                    categoriesData[item.cat].push(item);
-                    itemsData[index] = item;
-
-                    // تجميع الأصناف المميزة أو الأكثر طلباً للشريط المتحرك
+                items.forEach((item) => {
                     let catLower = item.cat.toLowerCase();
-                    if (catLower.includes('الأكثر') || catLower.includes('طلب') || catLower.includes('مميز') || catLower.includes('⭐') || catLower.includes('🔥')) {
+                    let isFeatured = catLower.includes('الأكثر') || catLower.includes('طلب') || catLower.includes('مميز') || catLower.includes('⭐') || catLower.includes('🔥');
+
+                    // تجميع أصناف الأكثر طلباً للشريط المتحرك وإخفاؤها من الأقسام التحتية
+                    if (isFeatured) {
                         featuredItems.push(item);
+                    } else {
+                        if (!categoriesData[item.cat]) categoriesData[item.cat] = [];
+                        categoriesData[item.cat].push(item);
                     }
                 });
 
-                // عرض الشريط المتحرك إذا وجدنا أصناف مميزة
+                // تكرار الأصناف المميزة تلقائياً لملء الشريط المتحرك تماماً ومنع أي فراغات
                 if (featuredItems.length > 0) {
                     let sliderHtml = `
                         <div class="slider-section">
@@ -244,9 +244,9 @@
                             <div class="slider-track-container">
                                 <div class="slider-track">`;
                     
-                    // نكرر الأصناف مرتين لضمان استمرار الحركة السلسة بدون انقطاع
-                    let renderList = [...featuredItems, ...featuredItems];
-                    renderList.forEach(fi => {
+                    // نكرر القائمة عدة مرات لضمان استمرار الشريط بدون أي فراغ نهائياً
+                    let multiFeatured = [...featuredItems, ...featuredItems, ...featuredItems, ...featuredItems];
+                    multiFeatured.forEach(fi => {
                         let fPrice = fi.priceMid || fi.priceBig || "0";
                         sliderHtml += `
                             <div class="slider-card">
@@ -264,6 +264,17 @@
                 let html = "", tabsHtml = "";
                 let globalIdx = 0;
 
+                // إعادة فهرسة العناصر الباقية للمنيو بدقة
+                items.forEach((item) => {
+                    let catLower = item.cat.toLowerCase();
+                    let isFeatured = catLower.includes('الأكثر') || catLower.includes('طلب') || catLower.includes('مميز') || catLower.includes('⭐') || catLower.includes('🔥');
+                    if (!isFeatured) {
+                        itemsData[globalIdx] = item;
+                        globalIdx++;
+                    }
+                });
+
+                let currentGlobalIdx = 0;
                 for (const cat in categoriesData) {
                     tabsHtml += `<button class="tab-btn" data-cat-target="${cat}">${cat}</button>`;
 
@@ -272,7 +283,7 @@
                     html += `<div class="menu-grid">`;
                     
                     categoriesData[cat].forEach(item => {
-                        let idx = globalIdx++;
+                        let idx = currentGlobalIdx++;
                         let hasMid = item.priceMid !== "" && item.priceMid !== "0";
                         let hasBig = item.priceBig !== "" && item.priceBig !== "0";
                         let defaultPrice = hasMid ? item.priceMid : (hasBig ? item.priceBig : "0");
@@ -299,6 +310,7 @@
                     });
                     html += `</div></div>`;
                 }
+
                 document.getElementById('menu-container').innerHTML = html;
                 document.getElementById('nav-tabs').innerHTML = tabsHtml;
                 
@@ -532,7 +544,7 @@
             });
 
             document.querySelectorAll('.qty-plus').forEach(btn => {
-                btn.addEventListener('click', function() { changeQuery ? changeQty(parseInt(this.getAttribute('data-index')), 1) : changeQty(parseInt(this.getAttribute('data-index')), 1); });
+                btn.addEventListener('click', function() { changeQty(parseInt(this.getAttribute('data-index')), 1); });
             });
         }
 
