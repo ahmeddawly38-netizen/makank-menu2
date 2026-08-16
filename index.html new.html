@@ -13,16 +13,17 @@
         .logo { width: 140px; height: 140px; border-radius: 50%; margin-bottom: 20px; object-fit: cover; border: 4px solid var(--primary); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .start-btn { background: var(--primary); color:white; padding:15px 40px; border-radius:30px; border:none; font-size:1.2rem; cursor:pointer; font-weight:bold; box-shadow: 0 4px 10px rgba(230,0,35,0.3); }
 
-        /* تنسيق الشريط المتحرك (Slider) للأكثر طلباً بدون فراغات */
-        .slider-section { background: #fff; padding: 15px 0; border-bottom: 3px solid #ffcc00; margin-bottom: 10px; overflow: hidden; }
+        /* تنسيق الشريط المتحرك السلس بدون أي فراغات */
+        .slider-section { background: #fff; padding: 15px 0; border-bottom: 3px solid #ffcc00; margin-bottom: 10px; overflow: hidden; width: 100%; }
         .slider-title { font-weight: bold; font-size: 1.1rem; color: #d4a017; padding: 0 15px 10px 15px; text-align: right; display: flex; align-items: center; gap: 5px; }
-        .slider-track-container { width: 100%; overflow: hidden; position: relative; }
-        .slider-track { display: flex; gap: 12px; width: max-content; animation: scrollSlider 20s linear infinite; padding: 5px 15px; }
+        .slider-track-container { width: 100%; overflow: hidden; position: relative; display: flex; }
+        
+        .slider-track { display: flex; gap: 12px; width: max-content; animation: smoothScroll 25s linear infinite; padding: 5px 15px; will-change: transform; }
         .slider-track:hover { animation-play-state: paused; }
 
-        @keyframes scrollSlider {
+        @keyframes smoothScroll {
             0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
+            100% { transform: translateX(calc(-50% - 6px)); }
         }
 
         .slider-card { width: 140px; background: #fffdf0; border: 1.5px solid #ffcc00; border-radius: 14px; padding: 8px; text-align: center; box-shadow: 0 3px 10px rgba(0,0,0,0.05); flex-shrink: 0; display: flex; flex-direction: column; justify-content: space-between; }
@@ -227,7 +228,6 @@
                     let catLower = item.cat.toLowerCase();
                     let isFeatured = catLower.includes('الأكثر') || catLower.includes('طلب') || catLower.includes('مميز') || catLower.includes('⭐') || catLower.includes('🔥');
 
-                    // تجميع أصناف الأكثر طلباً للشريط المتحرك وإخفاؤها من الأقسام التحتية
                     if (isFeatured) {
                         featuredItems.push(item);
                     } else {
@@ -236,7 +236,7 @@
                     }
                 });
 
-                // تكرار الأصناف المميزة تلقائياً لملء الشريط المتحرك تماماً ومنع أي فراغات
+                // تكرار العناصر المميزة 6 مرات لملء الشريط تماماً ومنع أي فراغات مهما كانت شاشة التليفون عريضة
                 if (featuredItems.length > 0) {
                     let sliderHtml = `
                         <div class="slider-section">
@@ -244,8 +244,11 @@
                             <div class="slider-track-container">
                                 <div class="slider-track">`;
                     
-                    // نكرر القائمة عدة مرات لضمان استمرار الشريط بدون أي فراغ نهائياً
-                    let multiFeatured = [...featuredItems, ...featuredItems, ...featuredItems, ...featuredItems];
+                    let multiFeatured = [];
+                    for(let k = 0; k < 6; k++) {
+                        multiFeatured = multiFeatured.concat(featuredItems);
+                    }
+
                     multiFeatured.forEach(fi => {
                         let fPrice = fi.priceMid || fi.priceBig || "0";
                         sliderHtml += `
@@ -264,7 +267,6 @@
                 let html = "", tabsHtml = "";
                 let globalIdx = 0;
 
-                // إعادة فهرسة العناصر الباقية للمنيو بدقة
                 items.forEach((item) => {
                     let catLower = item.cat.toLowerCase();
                     let isFeatured = catLower.includes('الأكثر') || catLower.includes('طلب') || catLower.includes('مميز') || catLower.includes('⭐') || catLower.includes('🔥');
@@ -511,7 +513,7 @@
         bindSafely('track-whatsapp-btn', () => {
             let val = document.getElementById('order-id').value; 
             if(val) {
-                window.open('https://wa.me/201021477251?text=' + encodeURIComponent('أريد الاستعلام عن طلب رقم أو هاتف: ' + val), '_blank'); 
+                window.open('https://wa.me/201021477251?text=' + encodeURIComponent('أريد الاستعلام عن طلب رقم أو هاتفك: ' + val), '_blank'); 
             } else {
                 alert("يرجى إدخال رقم الطلب أو الهاتف");
             }
