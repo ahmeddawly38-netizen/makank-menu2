@@ -13,14 +13,18 @@
         .logo { width: 140px; height: 140px; border-radius: 50%; margin-bottom: 20px; object-fit: cover; border: 4px solid var(--primary); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .start-btn { background: var(--primary); color:white; padding:15px 40px; border-radius:30px; border:none; font-size:1.2rem; cursor:pointer; font-weight:bold; box-shadow: 0 4px 10px rgba(230,0,35,0.3); }
 
-        /* تنسيق الشريط المتحرك بالحركة البرمجية الدقيقة */
+        /* الشريط المتحرك بنظام تكرار الكتلة المتصلة تماماً */
         .slider-section { background: #fff; padding: 15px 0; border-bottom: 3px solid #ffcc00; margin-bottom: 10px; overflow: hidden; width: 100%; }
         .slider-title { font-weight: bold; font-size: 1.1rem; color: #d4a017; padding: 0 15px 10px 15px; text-align: right; display: flex; align-items: center; gap: 5px; }
         
-        .slider-track-container { width: 100%; overflow-x: auto; scrollbar-width: none; display: flex; scroll-behavior: auto; }
-        .slider-track-container::-webkit-scrollbar { display: none; }
-        
-        .slider-track { display: flex; gap: 12px; width: max-content; padding: 5px 15px; }
+        .marquee-box { overflow: hidden; width: 100%; display: flex; position: relative; }
+        .marquee-track { display: flex; gap: 12px; width: max-content; animation: marqueeScroll 25s linear infinite; padding: 5px 0; }
+        .marquee-box:hover .marquee-track { animation-play-state: paused; }
+
+        @keyframes marqueeScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(50%); }
+        }
 
         .slider-card { width: 140px; background: #fffdf0; border: 1.5px solid #ffcc00; border-radius: 14px; padding: 8px; text-align: center; box-shadow: 0 3px 10px rgba(0,0,0,0.05); flex-shrink: 0; display: flex; flex-direction: column; justify-content: space-between; }
         .slider-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 10px; margin-bottom: 6px; background: #eee; }
@@ -232,22 +236,12 @@
                     }
                 });
 
-                // تكرار العناصر المميزة 10 مرات لضمان عدم حدوث أي فراغ نهائياً أثناء التحريك الآلي
+                // بناء الشريط المتحرك بنسختين متطتمامتين تماماً لمنع أي فراغ
                 if (featuredItems.length > 0) {
-                    let sliderHtml = `
-                        <div class="slider-section">
-                            <div class="slider-title">🔥 الأكثر طلباً لدينا</div>
-                            <div class="slider-track-container" id="sliderContainer">
-                                <div class="slider-track" id="sliderTrack">`;
-                    
-                    let multiFeatured = [];
-                    for(let k = 0; k < 10; k++) {
-                        multiFeatured = multiFeatured.concat(featuredItems);
-                    }
-
-                    multiFeatured.forEach(fi => {
+                    let cardsHtml = '';
+                    featuredItems.forEach(fi => {
                         let fPrice = fi.priceMid || fi.priceBig || "0";
-                        sliderHtml += `
+                        cardsHtml += `
                             <div class="slider-card">
                                 <img src="${fi.img}" loading="lazy" onerror="this.src='https://via.placeholder.com/150?text=مكانك'">
                                 <div class="slider-card-title">${fi.name}</div>
@@ -256,11 +250,17 @@
                             </div>`;
                     });
 
-                    sliderHtml += `</div></div></div>`;
+                    let sliderHtml = `
+                        <div class="slider-section">
+                            <div class="slider-title">🔥 الأكثر طلباً لدينا</div>
+                            <div class="marquee-box">
+                                <div class="marquee-track">
+                                    ${cardsHtml}
+                                    ${cardsHtml}
+                                </div>
+                            </div>
+                        </div>`;
                     document.getElementById('slider-container-wrapper').innerHTML = sliderHtml;
-
-                    // تشغيل حركة التمرير البرمجي السلس المتصل
-                    initAutoScroll();
                 }
 
                 let html = "", tabsHtml = "";
@@ -326,31 +326,6 @@
             } catch(e) {
                 document.getElementById('menu-container').innerHTML = "<p style='color:red; text-align:center;'>تعسّر تحميل المنيو، تأكد من الاتصال بالإنترنت.</p>";
             }
-        }
-
-        function initAutoScroll() {
-            const container = document.getElementById('sliderContainer');
-            if(!container) return;
-            
-            let scrollSpeed = 1; // سرعة الحركة
-            let isPaused = false;
-
-            container.addEventListener('mouseenter', () => isPaused = true);
-            container.addEventListener('mouseleave', () => isPaused = false);
-            container.addEventListener('touchstart', () => isPaused = true, {passive: true});
-            container.addEventListener('touchend', () => isPaused = false, {passive: true});
-
-            function step() {
-                if (!isPaused) {
-                    container.scrollLeft += scrollSpeed;
-                    // إذا وصل للنهاية تقريباً، يرجع للبداية بسلاسة تامة بدون ما يحس المستخدم
-                    if (container.scrollLeft >= (container.scrollWidth - container.clientWidth - 10)) {
-                        container.scrollLeft = 0;
-                    }
-                }
-                requestAnimationFrame(step);
-            }
-            requestAnimationFrame(step);
         }
 
         function addDirectItem(name, price) {
@@ -526,7 +501,7 @@
                       (orderType === 'دليفري' ? `🚚 *رسوم التوصيل:* ${DELIVERY_FEE} ج.م%0A` : ``) +
                       `✨ *إجمالي الطلب الكلي: ${grandTotal} ج.م*`;
 
-data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>            cart = [];
+            cart = [];
             localStorage.removeItem('myCart');
             updateCartCount();
             document.getElementById('cart-modal').style.display = 'none';
