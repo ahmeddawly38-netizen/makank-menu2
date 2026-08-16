@@ -22,7 +22,35 @@
         .category-title { font-weight: bold; font-size: 1.1rem; padding: 15px 15px 8px; color: var(--primary); text-align: right; border-bottom: 2px solid #eee; margin: 0 10px 10px 10px; }
 
         .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 10px; }
-        .item-card { background: white; border-radius: 18px; padding: 10px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between; }
+        .item-card { background: white; border-radius: 18px; padding: 10px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+        
+        /* تنسيق وحركة مميزة لكروت الأكثر طلباً والمميزة */
+        .item-card.featured {
+            border: 2px solid #ffcc00;
+            background: linear-gradient(135deg, #fffdf0 0%, #ffffff 100%);
+            animation: pulseGlow 2s infinite ease-in-out;
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: scale(1); box-shadow: 0 4px 12px rgba(255, 204, 0, 0.2); }
+            50% { transform: scale(1.02); box-shadow: 0 6px 20px rgba(255, 204, 0, 0.5); }
+            100% { transform: scale(1); box-shadow: 0 4px 12px rgba(255, 204, 0, 0.2); }
+        }
+
+        .featured-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ffcc00;
+            color: #333;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 2;
+        }
+
         .item-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 14px; margin-bottom: 8px; background: #eee; }
         .item-title { font-weight: bold; font-size: 0.95rem; margin: 5px 0; color: #222; }
         
@@ -209,7 +237,6 @@
                     itemsData[index] = item;
                 });
 
-                // إعادة ترتيب الأقبح بحيث تظهر الأقسام المميزة (الأكثر طلباً، جديد، إلخ) في البداية تلقائياً
                 let sortedCategories = {};
                 let catKeys = Object.keys(categoriesData);
                 
@@ -226,6 +253,9 @@
                 for (const cat in sortedCategories) {
                     tabsHtml += `<button class="tab-btn" data-cat-target="${cat}">${cat}</button>`;
                     
+                    // التحقق مما إذا كان القسم مميزاً (مثل الأكثر طلباً أو جديد)
+                    let isFeaturedCat = priorityCats.includes(cat);
+
                     html += `<div id="section-${cat}" class="category-section" data-cat="${cat}">`;
                     html += `<div class="category-title">${cat}</div>`;
                     html += `<div class="menu-grid">`;
@@ -236,8 +266,13 @@
                         let hasBig = item.priceBig !== "" && item.priceBig !== "0";
                         let defaultPrice = hasMid ? item.priceMid : (hasBig ? item.priceBig : "0");
 
+                        // إضافة الكلاس الحركي والشريط التجميلي إذا كان القسم مميزاً
+                        let cardClass = isFeaturedCat ? "item-card featured" : "item-card";
+                        let badgeHtml = isFeaturedCat ? `<div class="featured-badge">الأكثر مبيعاً 🔥</div>` : "";
+
                         html += `
-                            <div class="item-card">
+                            <div class="${cardClass}">
+                                ${badgeHtml}
                                 <img src="${item.img}" class="item-img" loading="lazy" onerror="this.src='https://via.placeholder.com/150?text=مكانك'">
                                 <div class="item-title">${item.name}</div>`;
                         
