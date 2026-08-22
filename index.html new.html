@@ -29,7 +29,7 @@
         }
 
         .slider-card { width: 140px; background: #fffdf0; border: 1.5px solid #ffcc00; border-radius: 14px; padding: 8px; text-align: center; box-shadow: 0 3px 10px rgba(0,0,0,0.05); flex-shrink: 0; display: flex; flex-direction: column; justify-content: space-between; }
-        .slider-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 10px; margin-bottom: 6px; background: #eee; }
+        .slider-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 10px; margin-bottom: 6px; background: #ffeaa7; }
         .slider-card-title { font-size: 0.85rem; font-weight: bold; color: #222; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .slider-card-price { font-size: 0.8rem; color: var(--primary); font-weight: bold; margin-bottom: 6px; }
         .slider-add-btn { background: var(--primary); color: white; border: none; padding: 4px; border-radius: 8px; font-size: 0.75rem; font-weight: bold; cursor: pointer; width: 100%; }
@@ -45,7 +45,7 @@
         .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 10px; }
         .item-card { background: white; border-radius: 18px; padding: 10px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between; position: relative; }
         
-        .item-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 14px; margin-bottom: 8px; background: #eee; }
+        .item-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 14px; margin-bottom: 8px; background: #fff5f5; }
         .item-title { font-weight: bold; font-size: 0.95rem; margin: 5px 0; color: #222; }
         
         .size-selector { display: flex; gap: 5px; margin-bottom: 8px; justify-content: center; }
@@ -275,10 +275,9 @@
                     let cardsHtml = '';
                     featuredItems.forEach(fi => {
                         let fPrice = fi.priceMid || fi.priceBig || "0";
-                        let proxyImg = fi.img ? `https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?url=${encodeURIComponent(fi.img)}&container=focus&gadget=a&no_cache=1` : '';
                         cardsHtml += `
                             <div class="slider-card">
-                                <img src="${proxyImg}" loading="lazy" onerror="this.src='https://via.placeholder.com/150?text=مكانك'">
+                                <img src="${fi.img}" loading="lazy" referrerpolicy="no-referrer" onerror="this.src='https://a.top4top.io/p_3881y3lnt1.jpg'">
                                 <div class="slider-card-title">${fi.name}</div>
                                 <div class="slider-card-price">${fPrice} ج.م</div>
                                 <button class="slider-add-btn" onclick="addDirectItem('${fi.name}', '${fPrice}')">طلب +</button>
@@ -316,11 +315,10 @@
                         let hasMid = item.priceMid !== "" && item.priceMid !== "0";
                         let hasBig = item.priceBig !== "" && item.priceBig !== "0";
                         let defaultPrice = hasMid ? item.priceMid : (hasBig ? item.priceBig : "0");
-                        let proxyImg = item.img ? `https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?url=${encodeURIComponent(item.img)}&container=focus&gadget=a&no_cache=1` : '';
 
                         html += `
                             <div class="item-card">
-                                <img src="${proxyImg}" class="item-img" loading="lazy" onerror="this.src='https://via.placeholder.com/150?text=مكانك'">
+                                <img src="${item.img}" class="item-img" loading="lazy" referrerpolicy="no-referrer" onerror="this.src='https://a.top4top.io/p_3881y3lnt1.jpg'">
                                 <div class="item-title">${item.name}</div>`;
                         
                         if (hasMid && hasBig) {
@@ -531,7 +529,7 @@
                       `-----------------------------------------%0A` +
                       itemsText + 
                       `%0A-----------------------------------------%0A` +
-                      (orderType === 'دليفري' ? `🚚 *رسوم التوصيل:* ${DELIVERY_FEE} ج.م%0A` : ``) +
+                      (orderType === 'دليفري' ? `🚚 *رسوم التوصيل:* ${DELIVERY_F_E ? DELIVERY_FEE : 10} ج.م%0A` : ``) +
                       `✨ *إجمالي الطلب الكلي: ${grandTotal} ج.م*`;
 
             cart = [];
