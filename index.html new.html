@@ -230,7 +230,6 @@
                 if (catCol !== "") currentCat = catCol;
                 
                 if (name !== "") {
-                    // تنظيف رابط الصورة بدقة من أي علامات تنصيص أو مسافات زائده قد تعطل التحميل
                     let rawImg = cols[4] ? cols[4].trim() : "";
                     rawImg = rawImg.replace(/^["']|["']$/g, '').trim();
 
@@ -248,7 +247,6 @@
 
         async function loadMenu() {
             try {
-                // إضافة رقم عشوائي لمنع الكاش القديم لجوجل شيت
                 const response = await fetch(SHEET_URL + "&t=" + new Date().getTime());
                 const data = await response.text();
                 const items = parseCSV(data);
@@ -277,9 +275,10 @@
                     let cardsHtml = '';
                     featuredItems.forEach(fi => {
                         let fPrice = fi.priceMid || fi.priceBig || "0";
+                        let proxyImg = fi.img ? `https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?url=${encodeURIComponent(fi.img)}&container=focus&gadget=a&no_cache=1` : '';
                         cardsHtml += `
                             <div class="slider-card">
-                                <img src="${fi.img}" loading="lazy" referrerpolicy="no-referrer" onerror="this.src='https://via.placeholder.com/150?text=مكانك'">
+                                <img src="${proxyImg}" loading="lazy" onerror="this.src='https://via.placeholder.com/150?text=مكانك'">
                                 <div class="slider-card-title">${fi.name}</div>
                                 <div class="slider-card-price">${fPrice} ج.م</div>
                                 <button class="slider-add-btn" onclick="addDirectItem('${fi.name}', '${fPrice}')">طلب +</button>
@@ -317,10 +316,11 @@
                         let hasMid = item.priceMid !== "" && item.priceMid !== "0";
                         let hasBig = item.priceBig !== "" && item.priceBig !== "0";
                         let defaultPrice = hasMid ? item.priceMid : (hasBig ? item.priceBig : "0");
+                        let proxyImg = item.img ? `https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?url=${encodeURIComponent(item.img)}&container=focus&gadget=a&no_cache=1` : '';
 
                         html += `
                             <div class="item-card">
-                                <img src="${item.img}" class="item-img" loading="lazy" referrerpolicy="no-referrer" onerror="this.src='https://via.placeholder.com/150?text=مكانك'">
+                                <img src="${proxyImg}" class="item-img" loading="lazy" onerror="this.src='https://via.placeholder.com/150?text=مكانك'">
                                 <div class="item-title">${item.name}</div>`;
                         
                         if (hasMid && hasBig) {
