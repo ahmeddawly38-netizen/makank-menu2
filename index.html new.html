@@ -9,7 +9,6 @@
         :root { --primary: #e60023; --bg: #f8f8f8; }
         body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; padding-bottom: 100px; }
         
-        /* البانر التفاعلي والعداد */
         #promo-banner { background: var(--primary); color: white; padding: 12px 5px; font-weight: bold; font-size: 0.95rem; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.2); text-align: center; }
         #promo-banner .counter-box { font-size: 0.9rem; margin-top: 4px; background: rgba(0,0,0,0.2); padding: 4px; border-radius: 10px; display: inline-block; }
         
@@ -77,9 +76,8 @@
         <button class="start-btn" id="start-app-btn">ابدأ الطلب 🍽️</button>
     </div>
 
-    <!-- البانر التفاعلي المدمج بالعداد -->
     <div id="promo-banner">
-        🔥 عرض اليوم: هدية باكت بطاطس لأول 10 أوردرات! 🍟
+        🔥 عرض اليوم: هدية بطاطس لأول 10 أوردرات! 🍟
         <div>
             <span class="counter-box">متبقي حالياً: <span id="promo-counter">10</span> أوردرات فقط!</span>
         </div>
@@ -93,7 +91,7 @@
     <footer style="background: #222; color: #fff; padding: 25px 15px; text-align: center; margin-top: 30px; border-top: 4px solid var(--primary); font-family: 'Cairo', sans-serif;">
         <div style="max-width: 600px; margin: 0 auto;">
             <h3 style="margin: 0 0 10px 0; font-size: 1.2rem; color: #fff;">مطعم مكانك 🍽️</h3>
-            <p style="font-size: 0.85rem; color: #bbb; margin: 0 0 15px 0;">أفضل المأكولات - العريش، أبو صقل</p>
+            <p style="font-size: 0.85rem; color: #bbb; margin: 0 0 15px 0;">أفضل المأكولات - العريش، أبو صقيل</p>
             
             <div style="margin-bottom: 15px; font-size: 0.9rem;">
                 📞 تواصل معنا: <a href="tel:201021477251" style="color: #25D366; text-decoration: none; font-weight: bold;" dir="ltr">01021477251</a>
@@ -164,7 +162,6 @@
     </div>
 
     <script>
-        // إعدادات العداد التلقائي
         let remaining = localStorage.getItem('promoCount');
         if (remaining === null) {
             remaining = 10;
@@ -300,16 +297,7 @@
                 let html = "", tabsHtml = "";
                 let globalIdx = 0;
 
-                items.forEach((item) => {
-                    let catLower = item.cat.toLowerCase();
-                    let isFeatured = catLower.includes('الأكثر') || catLower.includes('طلب') || catLower.includes('مميز') || catLower.includes('⭐') || catLower.includes('🔥');
-                    if (!isFeatured) {
-                        itemsData[globalIdx] = item;
-                        globalIdx++;
-                    }
-                });
-
-                let currentGlobalIdx = 0;
+                // حفظ جميع الأصناف غير المميزة في itemsData بترتيبها السليم
                 for (const cat in categoriesData) {
                     tabsHtml += `<button class="tab-btn" data-cat-target="${cat}">${cat}</button>`;
 
@@ -318,7 +306,10 @@
                     html += `<div class="menu-grid">`;
                     
                     categoriesData[cat].forEach(item => {
-                        let idx = currentGlobalIdx++;
+                        let idx = globalIdx;
+                        itemsData[idx] = item; // تخزين العنصر بالـ Index الصحيح
+                        globalIdx++;
+
                         let hasMid = item.priceMid !== "" && item.priceMid !== "0";
                         let hasBig = item.priceBig !== "" && item.priceBig !== "0";
                         let defaultPrice = hasMid ? item.priceMid : (hasBig ? item.priceBig : "0");
@@ -508,7 +499,6 @@
             localStorage.setItem('savedCustName', custName);
             localStorage.setItem('savedCustAddress', custAddress);
 
-            // خصم أوردر من العداد التلقائي عند إرسال الطلب بنجاح
             decreasePromo();
 
             let invoiceNo = localStorage.getItem('lastInvoiceNo') ? parseInt(localStorage.getItem('lastInvoiceNo')) + 1 : 1;
