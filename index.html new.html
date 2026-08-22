@@ -9,12 +9,9 @@
         :root { --primary: #e60023; --bg: #f8f8f8; }
         body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; padding-bottom: 100px; }
         
-        #promo-banner { background: var(--primary); color: white; padding: 12px 5px; font-weight: bold; font-size: 0.95rem; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.2); text-align: center; }
-        #promo-banner .counter-box { font-size: 0.9rem; margin-top: 4px; background: rgba(0,0,0,0.2); padding: 4px; border-radius: 10px; display: inline-block; }
-        
-        #welcome-screen { position: fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding: 20px; box-sizing: border-box; }
+        #welcome-screen { position: fixed; top:0; left:0; width:100%; height:100%; background:white ; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding: 20px; box-sizing: border-box; }
         .logo { width: 140px; height: 140px; border-radius: 50%; margin-bottom: 20px; object-fit: cover; border: 4px solid var(--primary); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .start-btn { background: var(--primary); color:white; padding:15px 40px; border-radius:30px; border:none; font-size:1.2rem; cursor:pointer; font-weight:bold; box-shadow: 0 4px 10px rgba(230,0,35,0.3); }
+        .start-btn { background: var(--primary); color:black; padding:15px 40px; border-radius:30px; border:none; font-size:1.2rem; cursor:pointer; font-weight:bold; box-shadow: 0 4px 10px rgba(230,0,35,0.3); }
 
         .slider-section { background: #fff; padding: 15px 0; border-bottom: 3px solid #ffcc00; margin-bottom: 10px; overflow: hidden; width: 100%; }
         .slider-title { font-weight: bold; font-size: 1.1rem; color: #d4a017; padding: 0 15px 10px 15px; text-align: right; display: flex; align-items: center; gap: 5px; }
@@ -34,12 +31,12 @@
         .slider-card-price { font-size: 0.8rem; color: var(--primary); font-weight: bold; margin-bottom: 6px; }
         .slider-add-btn { background: var(--primary); color: white; border: none; padding: 4px; border-radius: 8px; font-size: 0.75rem; font-weight: bold; cursor: pointer; width: 100%; }
 
-        #nav-tabs { background: #fff; display: flex; padding: 12px 15px; gap: 10px; overflow-x: auto; position: sticky; top: 75px; z-index: 900; box-shadow: 0 2px 5px rgba(0,0,0,0.05); scrollbar-width: none; }
+        #nav-tabs { background: #fff; display: flex; padding: 12px 15px; gap: 10px; overflow-x: auto; position: sticky; top: 0; z-index: 900; box-shadow: 0 2px 5px rgba(0,0,0,0.05); scrollbar-width: none; }
         #nav-tabs::-webkit-scrollbar { display: none; }
         .tab-btn { background: #f0f0f0; padding: 6px 18px; border-radius: 20px; cursor: pointer; white-space: nowrap; font-weight: bold; border: 1px solid #eee; font-family: 'Cairo', sans-serif; font-size: 0.9rem; transition: 0.2s; }
         .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
         
-        .category-section { margin-bottom: 15px; scroll-margin-top: 140px; }
+        .category-section { margin-bottom: 15px; scroll-margin-top: 70px; }
         .category-title { font-weight: bold; font-size: 1.1rem; padding: 15px 15px 8px; color: var(--primary); text-align: right; border-bottom: 2px solid #eee; margin: 0 10px 10px 10px; }
 
         .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 10px; }
@@ -70,23 +67,15 @@
 <body>
 
     <div id="welcome-screen">
-        <img src="https://a.top4top.io/p_3881y3lnt1.jpg" class="logo" alt="مطعم مكانك" referrerpolicy="no-referrer">
+        <img src="https://a.top4top.io/p_3881y3lnt1.jpg" class="logo" alt="مطعم مكانك">
         <h1>مطعم مكانك</h1>
         <p style="color: #666; margin-bottom: 25px;">هو اختيارك الافضل</p>
         <button class="start-btn" id="start-app-btn">ابدأ الطلب 🍽️</button>
     </div>
 
-    <div id="promo-banner">
-        🔥 عرض اليوم: هدية بطاطس لأول 10 أوردرات! 🍟
-        <div>
-            <span class="counter-box">متبقي حالياً: <span id="promo-counter">10</span> أوردرات فقط!</span>
-        </div>
-        <div style="font-size: 0.8rem; margin-top: 3px;">اكتب "مكانك-بطاطس" في الملاحظات 📝</div>
-    </div>
-
     <div id="slider-container-wrapper"></div>
     <div id="nav-tabs"></div>
-    <div id="menu-container" style="text-align: center; padding-top: 20px;">جاري تحميل الأصناف...</div>
+    <div id="menu-container" style="padding-top: 5px; text-align: center; padding-top: 20px;">جاري تحميل الأصناف...</div>
     
     <footer style="background: #222; color: #fff; padding: 25px 15px; text-align: center; margin-top: 30px; border-top: 4px solid var(--primary); font-family: 'Cairo', sans-serif;">
         <div style="max-width: 600px; margin: 0 auto;">
@@ -142,8 +131,8 @@
                     <input type="text" id="cust-address" class="input-field" placeholder="المنطقة، الشارع، رقم الحائط...">
                 </div>
 
-                <label style="font-size: 0.85rem; font-weight: bold; color: var(--primary);">📝 ملاحظات على الطلب (اكتب مكانك-بطاطس هنا):</label>
-                <input type="text" id="order-notes" class="input-field" placeholder="اكتب مكانك-بطاطس للاستفادة من الهدية...">
+                <label style="font-size: 0.85rem; font-weight: bold; color: var(--primary);">📝 ملاحظات على الطلب (سبايسي، بدون صوص، إلخ):</label>
+                <input type="text" id="order-notes" class="input-field" placeholder="اكتب أي ملاحظات أو تعديلات تفضلها...">
             </div>
 
             <button class="action-btn" id="whatsapp-btn" style="background:#25D366; color:white;">إرسال الطلب عبر واتساب 🚚</button>
@@ -162,27 +151,6 @@
     </div>
 
     <script>
-        let remaining = localStorage.getItem('promoCount');
-        if (remaining === null) {
-            remaining = 10;
-            localStorage.setItem('promoCount', remaining);
-        }
-        document.getElementById('promo-counter').innerText = remaining;
-        if(remaining <= 0) {
-            document.getElementById('promo-banner').style.display = 'none';
-        }
-
-        function decreasePromo() {
-            if (remaining > 0) {
-                remaining--;
-                localStorage.setItem('promoCount', remaining);
-                document.getElementById('promo-counter').innerText = remaining;
-                if(remaining <= 0) {
-                    document.getElementById('promo-banner').style.display = 'none';
-                }
-            }
-        }
-
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/1Ma5vOPN4iU321SfRkkg1KF3vumXnCpdLExw9e_zw764/export?format=csv";
         let cart = JSON.parse(localStorage.getItem('myCart')) || [];
         let itemsData = {};
@@ -274,7 +242,7 @@
                         let fPrice = fi.priceMid || fi.priceBig || "0";
                         cardsHtml += `
                             <div class="slider-card">
-                                <img src="${fi.img}" loading="lazy" referrerpolicy="no-referrer" onerror="this.src='https://via.placeholder.com/150?text=مكانك'">
+                                <img src="${fi.img}" loading="lazy" onerror="this.src='https://via.placeholder.com/150?text=مكانك'">
                                 <div class="slider-card-title">${fi.name}</div>
                                 <div class="slider-card-price">${fPrice} ج.م</div>
                                 <button class="slider-add-btn" onclick="addDirectItem('${fi.name}', '${fPrice}')">طلب +</button>
@@ -297,6 +265,16 @@
                 let html = "", tabsHtml = "";
                 let globalIdx = 0;
 
+                items.forEach((item) => {
+                    let catLower = item.cat.toLowerCase();
+                    let isFeatured = catLower.includes('الأكثر') || catLower.includes('طلب') || catLower.includes('مميز') || catLower.includes('⭐') || catLower.includes('🔥');
+                    if (!isFeatured) {
+                        itemsData[globalIdx] = item;
+                        globalIdx++;
+                    }
+                });
+
+                let currentGlobalIdx = 0;
                 for (const cat in categoriesData) {
                     tabsHtml += `<button class="tab-btn" data-cat-target="${cat}">${cat}</button>`;
 
@@ -305,17 +283,14 @@
                     html += `<div class="menu-grid">`;
                     
                     categoriesData[cat].forEach(item => {
-                        let idx = globalIdx;
-                        itemsData[idx] = item; 
-                        globalIdx++;
-
+                        let idx = currentGlobalIdx++;
                         let hasMid = item.priceMid !== "" && item.priceMid !== "0";
                         let hasBig = item.priceBig !== "" && item.priceBig !== "0";
                         let defaultPrice = hasMid ? item.priceMid : (hasBig ? item.priceBig : "0");
 
                         html += `
                             <div class="item-card">
-                                <img src="${item.img}" class="item-img" loading="lazy" referrerpolicy="no-referrer" onerror="this.src='https://via.placeholder.com/150?text=مكانك'">
+                                <img src="${item.img}" class="item-img" loading="lazy" onerror="this.src='https://via.placeholder.com/150?text=مكانك'">
                                 <div class="item-title">${item.name}</div>`;
                         
                         if (hasMid && hasBig) {
@@ -497,8 +472,6 @@
 
             localStorage.setItem('savedCustName', custName);
             localStorage.setItem('savedCustAddress', custAddress);
-
-            decreasePromo();
 
             let invoiceNo = localStorage.getItem('lastInvoiceNo') ? parseInt(localStorage.getItem('lastInvoiceNo')) + 1 : 1;
             if(invoiceNo > 999) invoiceNo = 1;
