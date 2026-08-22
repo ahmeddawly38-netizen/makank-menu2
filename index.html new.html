@@ -9,9 +9,6 @@
         :root { --primary: #e60023; --bg: #f8f8f8; }
         body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; padding-bottom: 100px; }
         
-        #promo-banner { background: var(--primary); color: white; padding: 12px 5px; font-weight: bold; font-size: 0.95rem; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.2); text-align: center; }
-        #promo-banner .counter-box { font-size: 0.9rem; margin-top: 4px; background: rgba(0,0,0,0.2); padding: 4px; border-radius: 10px; display: inline-block; }
-        
         #welcome-screen { position: fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding: 20px; box-sizing: border-box; }
         .logo { width: 140px; height: 140px; border-radius: 50%; margin-bottom: 20px; object-fit: cover; border: 4px solid var(--primary); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .start-btn { background: var(--primary); color:white; padding:15px 40px; border-radius:30px; border:none; font-size:1.2rem; cursor:pointer; font-weight:bold; box-shadow: 0 4px 10px rgba(230,0,35,0.3); }
@@ -34,12 +31,12 @@
         .slider-card-price { font-size: 0.8rem; color: var(--primary); font-weight: bold; margin-bottom: 6px; }
         .slider-add-btn { background: var(--primary); color: white; border: none; padding: 4px; border-radius: 8px; font-size: 0.75rem; font-weight: bold; cursor: pointer; width: 100%; }
 
-        #nav-tabs { background: #fff; display: flex; padding: 12px 15px; gap: 10px; overflow-x: auto; position: sticky; top: 75px; z-index: 900; box-shadow: 0 2px 5px rgba(0,0,0,0.05); scrollbar-width: none; }
+        #nav-tabs { background: #fff; display: flex; padding: 12px 15px; gap: 10px; overflow-x: auto; position: sticky; top: 0; z-index: 900; box-shadow: 0 2px 5px rgba(0,0,0,0.05); scrollbar-width: none; }
         #nav-tabs::-webkit-scrollbar { display: none; }
         .tab-btn { background: #f0f0f0; padding: 6px 18px; border-radius: 20px; cursor: pointer; white-space: nowrap; font-weight: bold; border: 1px solid #eee; font-family: 'Cairo', sans-serif; font-size: 0.9rem; transition: 0.2s; }
         .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
         
-        .category-section { margin-bottom: 15px; scroll-margin-top: 140px; }
+        .category-section { margin-bottom: 15px; scroll-margin-top: 70px; }
         .category-title { font-weight: bold; font-size: 1.1rem; padding: 15px 15px 8px; color: var(--primary); text-align: right; border-bottom: 2px solid #eee; margin: 0 10px 10px 10px; }
 
         .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 10px; }
@@ -74,14 +71,6 @@
         <h1>مطعم مكانك</h1>
         <p style="color: #666; margin-bottom: 25px;">هو اختيارك الافضل</p>
         <button class="start-btn" id="start-app-btn">ابدأ الطلب 🍽️</button>
-    </div>
-
-    <div id="promo-banner">
-        🔥 عرض اليوم: هدية بطاطس لأول 10 أوردرات! 🍟
-        <div>
-            <span class="counter-box">متبقي حالياً: <span id="promo-counter">10</span> أوردرات فقط!</span>
-        </div>
-        <div style="font-size: 0.8rem; margin-top: 3px;">اكتب "مكانك-بطاطس" في الملاحظات 📝</div>
     </div>
 
     <div id="slider-container-wrapper"></div>
@@ -142,8 +131,8 @@
                     <input type="text" id="cust-address" class="input-field" placeholder="المنطقة، الشارع، رقم الحائط...">
                 </div>
 
-                <label style="font-size: 0.85rem; font-weight: bold; color: var(--primary);">📝 ملاحظات على الطلب (اكتب مكانك-بطاطس هنا):</label>
-                <input type="text" id="order-notes" class="input-field" placeholder="اكتب مكانك-بطاطس للاستفادة من الهدية...">
+                <label style="font-size: 0.85rem; font-weight: bold; color: var(--primary);">📝 ملاحظات على الطلب:</label>
+                <input type="text" id="order-notes" class="input-field" placeholder="أي ملاحظات إضافية...">
             </div>
 
             <button class="action-btn" id="whatsapp-btn" style="background:#25D366; color:white;">إرسال الطلب عبر واتساب 🚚</button>
@@ -162,27 +151,6 @@
     </div>
 
     <script>
-        let remaining = localStorage.getItem('promoCount');
-        if (remaining === null) {
-            remaining = 10;
-            localStorage.setItem('promoCount', remaining);
-        }
-        document.getElementById('promo-counter').innerText = remaining;
-        if(remaining <= 0) {
-            document.getElementById('promo-banner').style.display = 'none';
-        }
-
-        function decreasePromo() {
-            if (remaining > 0) {
-                remaining--;
-                localStorage.setItem('promoCount', remaining);
-                document.getElementById('promo-counter').innerText = remaining;
-                if(remaining <= 0) {
-                    document.getElementById('promo-banner').style.display = 'none';
-                }
-            }
-        }
-
         const SHEET_URL = "https://docs.google.com/spreadsheets/d/1Ma5vOPN4iU321SfRkkg1KF3vumXnCpdLExw9e_zw764/export?format=csv&id=1Ma5vOPN4iU321SfRkkg1KF3vumXnCpdLExw9e_zw764&gid=0";
         let cart = JSON.parse(localStorage.getItem('myCart')) || [];
         let itemsData = {};
@@ -501,8 +469,6 @@
             localStorage.setItem('savedCustName', custName);
             localStorage.setItem('savedCustAddress', custAddress);
 
-            decreasePromo();
-
             let invoiceNo = localStorage.getItem('lastInvoiceNo') ? parseInt(localStorage.getItem('lastInvoiceNo')) + 1 : 1;
             if(invoiceNo > 999) invoiceNo = 1;
             localStorage.setItem('lastInvoiceNo', invoiceNo);
@@ -529,7 +495,7 @@
                       `-----------------------------------------%0A` +
                       itemsText + 
                       `%0A-----------------------------------------%0A` +
-                      (orderType === 'دليفري' ? `🚚 *رسوم التوصيل:* ${DELIVERY_F_E ? DELIVERY_FEE : 10} ج.م%0A` : ``) +
+                      (orderType === 'دليفري' ? `🚚 *رسوم التوصيل:* ${DELIVERY_FEE} ج.م%0A` : ``) +
                       `✨ *إجمالي الطلب الكلي: ${grandTotal} ج.م*`;
 
             cart = [];
