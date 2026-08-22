@@ -70,7 +70,7 @@
 <body>
 
     <div id="welcome-screen">
-        <img src="https://a.top4top.io/p_3881y3lnt1.jpg" class="logo" alt="مطعم مكانك">
+        <img src="https://a.top4top.io/p_3881y3lnt1.jpg" class="logo" alt="مطعم مكانك" referrerpolicy="no-referrer">
         <h1>مطعم مكانك</h1>
         <p style="color: #666; margin-bottom: 25px;">هو اختيارك الافضل</p>
         <button class="start-btn" id="start-app-btn">ابدأ الطلب 🍽️</button>
@@ -274,7 +274,7 @@
                         let fPrice = fi.priceMid || fi.priceBig || "0";
                         cardsHtml += `
                             <div class="slider-card">
-                                <img src="${fi.img}" loading="lazy" onerror="this.src='https://via.placeholder.com/150?text=مكانك'">
+                                <img src="${fi.img}" loading="lazy" referrerpolicy="no-referrer" onerror="this.src='https://via.placeholder.com/150?text=مكانك'">
                                 <div class="slider-card-title">${fi.name}</div>
                                 <div class="slider-card-price">${fPrice} ج.م</div>
                                 <button class="slider-add-btn" onclick="addDirectItem('${fi.name}', '${fPrice}')">طلب +</button>
@@ -297,7 +297,6 @@
                 let html = "", tabsHtml = "";
                 let globalIdx = 0;
 
-                // حفظ جميع الأصناف غير المميزة في itemsData بترتيبها السليم
                 for (const cat in categoriesData) {
                     tabsHtml += `<button class="tab-btn" data-cat-target="${cat}">${cat}</button>`;
 
@@ -307,7 +306,7 @@
                     
                     categoriesData[cat].forEach(item => {
                         let idx = globalIdx;
-                        itemsData[idx] = item; // تخزين العنصر بالـ Index الصحيح
+                        itemsData[idx] = item; 
                         globalIdx++;
 
                         let hasMid = item.priceMid !== "" && item.priceMid !== "0";
@@ -316,7 +315,7 @@
 
                         html += `
                             <div class="item-card">
-                                <img src="${item.img}" class="item-img" loading="lazy" onerror="this.src='https://via.placeholder.com/150?text=مكانك'">
+                                <img src="${item.img}" class="item-img" loading="lazy" referrerpolicy="no-referrer" onerror="this.src='https://via.placeholder.com/150?text=مكانك'">
                                 <div class="item-title">${item.name}</div>`;
                         
                         if (hasMid && hasBig) {
