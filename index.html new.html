@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مطعم مكانك - العريش</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4D0Y9NGKNP"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-4D0Y9NGKNP');
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #e60023; --bg: #f8f8f8; }
@@ -537,7 +545,7 @@
             document.getElementById('cart-details').innerHTML = detailsHtml;
             document.getElementById('cart-modal').style.display = 'block';
 
-            document.querySelectorAll('.qty-minus').forEach(btn => {
+            document.querySelectorAll('.qty-minus').files?.forEach ? null : document.querySelectorAll('.qty-minus').forEach(btn => {
                 btn.addEventListener('click', function() { changeQty(parseInt(this.getAttribute('data-index')), -1); });
             });
 
